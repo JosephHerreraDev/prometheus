@@ -16,12 +16,12 @@
 
   "modules-right": [
     "privacy",
-    "cpu",
     "bluetooth",
     "network",
     "pulseaudio", 
     "backlight",
     "battery",
+    "cpu",
     "custom/notification"
   ],
 

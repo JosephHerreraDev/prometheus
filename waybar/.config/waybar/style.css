@@ -17,7 +17,7 @@
 }
 
 /* --- Common module block --- */
-#workspaces, #memory, #cpu, #privacy{
+#workspaces, #privacy{
   background-color: @bg;
   color: @fg;
   padding: 0.3rem 0.7rem;
@@ -41,7 +41,7 @@
   transition: background-color 0.2s ease-in-out, color 0.2s ease-in-out;
 }
 
-#bluetooth, #pulseaudio,
+#bluetooth, #pulseaudio, #cpu,
 #backlight, #network, #custom-notification, #battery
 {
   background-color: @bg-darker;
@@ -76,7 +76,7 @@
 }
 
 #workspaces { padding: 2px; margin-left: 7px; margin-right: 5px; }
-#memory:hover, #cpu:hover, #clock:hover,
+#cpu:hover, #clock:hover,
 #bluetooth:hover, #pulseaudio:hover, #backlight:hover,
 #network:hover, #custom-lock:hover, #custom-notification:hover, #battery:hover {
   background-color: @bg-hover;
