@@ -1,0 +1,1 @@
+run_logged $PROMETHEUS_INSTALL/packaging/base.sh
