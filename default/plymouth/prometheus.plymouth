@@ -1,0 +1,11 @@
+[Plymouth Theme]
+Name=Prometheus
+Description=Prometheus splash screen.
+ModuleName=script
+
+[script]
+ImageDir=/usr/share/plymouth/themes/prometheus
+ScriptFile=/usr/share/plymouth/themes/prometheus/prometheus.script
+ConsoleLogBackgroundColor=0x1a1b26
+MonospaceFont=Cantarell 11
+Font=Cantarell 11
