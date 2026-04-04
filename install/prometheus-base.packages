@@ -42,7 +42,7 @@ gpu-screen-recorder
 gum
 hyprland
 hyprland-guiutils
-hyprland-preview-share-picker
+# hyprland-preview-share-picker
 hyprpicker
 hyprsunset
 imagemagick
@@ -68,7 +68,7 @@ nvim
 obs-studio
 obsidian
 pamixer
-pinta
+#pinta
 playerctl
 plocate
 #polkit-gnome
@@ -83,7 +83,7 @@ ripgrep
 satty
 sddm
 slurp
-spotify
+#spotify
 starship
 swaybg
 swayosd
@@ -91,11 +91,11 @@ system-config-printer
 tldr
 tree-sitter-cli
 tmux
-ttf-ia-writer
+#ttf-ia-writer
 ttf-jetbrains-mono-nerd
-typora
+#typora
 ufw
-ufw-docker
+#ufw-docker
 unzip
 usage
 waybar
@@ -107,7 +107,7 @@ wl-clipboard
 woff2-font-awesome
 xdg-desktop-portal-gtk
 xdg-desktop-portal-hyprland
-xdg-terminal-exec
-yaru-icon-theme
-yay
+#xdg-terminal-exec
+#yaru-icon-theme
+#yay
 zoxide
