@@ -79,9 +79,6 @@ symbol = " "
 [gcloud]
 symbol = " "
 
-[git_branch]
-symbol = " "
-
 [git_commit]
 tag_symbol = '  '
 
