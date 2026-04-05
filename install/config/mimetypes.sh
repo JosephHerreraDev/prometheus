@@ -1,6 +1,3 @@
-prometheus-refresh-applications
-update-desktop-database ~/.local/share/applications
-
 # Open directories in file manager
 #xdg-mime default org.gnome.Nautilus.desktop inode/directory
 

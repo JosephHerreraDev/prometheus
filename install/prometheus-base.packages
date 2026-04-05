@@ -73,7 +73,7 @@ playerctl
 plocate
 #polkit-gnome
 power-profiles-daemon
-# python-gobject
+python-gobject
 # python-poetry-core
 # python-terminaltexteffects
 qt5-wayland

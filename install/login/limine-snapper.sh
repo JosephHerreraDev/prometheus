@@ -71,7 +71,7 @@ EOF
   sudo sed -i 's/^SPACE_LIMIT="0.5"/SPACE_LIMIT="0.3"/' /etc/snapper/configs/{root,home}
   sudo sed -i 's/^FREE_LIMIT="0.2"/FREE_LIMIT="0.3"/' /etc/snapper/configs/{root,home}
 
-  chrootable_systemctl_enable limine-snapper-sync.service
+  sudo systemctl enable --now limine-snapper-sync.service
 fi
 
 echo "Re-enabling mkinitcpio hooks..."
