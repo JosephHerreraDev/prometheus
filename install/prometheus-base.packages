@@ -6,9 +6,7 @@ yazi
 zathura
 zathura-pdf-poppler
 
-# Theme colors extractor
-# aether
-# alacritty
+aether
 alsa-utils
 bash-completion
 bat
@@ -33,7 +31,6 @@ fcitx5
 fcitx5-gtk
 fcitx5-qt
 fd
-# ffmpegthumbnailer
 fontconfig
 fzf
 github-cli
@@ -42,7 +39,6 @@ gpu-screen-recorder
 gum
 hyprland
 hyprland-guiutils
-# hyprland-preview-share-picker
 hyprpicker
 hyprsunset
 imagemagick
@@ -50,8 +46,6 @@ impala
 imv
 inxi
 iwd
-#json tool
-#jq
 kernel-modules-hook
 kvantum-qt5
 lazydocker
@@ -72,19 +66,15 @@ pamixer
 playerctl
 plocate
 plymouth
-#polkit-gnome
 power-profiles-daemon
 python-gobject
-# python-poetry-core
-# python-terminaltexteffects
+python-poetry-core
 qt5-wayland
 ripgrep
-#ruby
-#rust
 satty
 sddm
 slurp
-#spotify
+spotify-launcher
 starship
 swaybg
 swayosd
@@ -92,11 +82,9 @@ system-config-printer
 tldr
 tree-sitter-cli
 tmux
-#ttf-ia-writer
 ttf-jetbrains-mono-nerd
 #typora
 ufw
-#ufw-docker
 unzip
 usage
 waybar
@@ -108,7 +96,4 @@ wl-clipboard
 woff2-font-awesome
 xdg-desktop-portal-gtk
 xdg-desktop-portal-hyprland
-#xdg-terminal-exec
-#yaru-icon-theme
-#yay
 zoxide

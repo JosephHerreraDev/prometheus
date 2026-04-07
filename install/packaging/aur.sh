@@ -11,3 +11,6 @@ if ! command -v yay &> /dev/null; then
   cd ..
   rm -rf yay
 fi
+
+mapfile -t packages < <(grep -v '^#' "$PROMETHEUS_INSTALL/prometheus-aur.packages" | grep -v '^$')
+prometheus-pkg-aur-add "${packages[@]}"

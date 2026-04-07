@@ -1,6 +1,3 @@
-# Install silent theme
-yay -S --noconfirm sddm-silent-theme
-
 sudo tee /etc/sddm.conf > /dev/null <<EOF
 [General]
 InputMethod=qtvirtualkeyboard
