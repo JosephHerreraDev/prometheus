@@ -1,11 +1,11 @@
 aether
 sddm-silent-theme
-brave-bin
+#brave-bin
 hyprshot
-spicetify-cli 
-spicetify-themes-git
+#spicetify-cli 
+#spicetify-themes-git
 hyprland-preview-share-picker-git
 python-terminaltexteffects
-ufw-docker
+#ufw-docker
 xdg-terminal-exec
-yaru-icon-theme
+#yaru-icon-theme
