@@ -1,4 +1,4 @@
-@import "~/.config/rofi/theme.rasi"
+@import "~/.config/prometheus/current/theme/theme.rasi"
 
 configuration {
 	modi:                       "drun,run,filebrowser";

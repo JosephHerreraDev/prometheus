@@ -1,1 +1,0 @@
-/home/joseph/.config/themes/nord/nvim.lua
