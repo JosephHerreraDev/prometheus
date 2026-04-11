@@ -22,7 +22,6 @@
     "backlight",
     "battery",
     "cpu",
-    "custom/notification"
   ],
 
   "hyprland/workspaces": {
@@ -40,7 +39,7 @@
       "9": "9",
       "10": "0",
       "active": "󱓻"
-      // "active": ""
+      //"active": ""
     },
     "persistent-workspaces": {
       "1": [],
@@ -54,7 +53,7 @@
   "cpu": {
     "interval": 5,
     "format": "",
-    "on-click": "kitty -e btop"
+    "on-click": "prometheus-launch-or-focus-tui btop"
   },
 
   "clock": {
@@ -86,31 +85,39 @@
       "off": "󰂲",
       "connected": "󰂱"
     },
-    "on-click": "blueman-manager",
-    "tooltip-format-connected":"{device_enumerate}"
+    "on-click": "prometheus-launch-bluetooth",
+    "tooltip-format":"Devices connected: {num_connections}"
   },
-
   "network": {
-    "format-wifi": "󰤢",
-    "format-ethernet": "󰈀",
-    "format-disconnected": "󰤠",
-    "interval": 5,
-    "tooltip-format": "{essid} ({signalStrength}%)",
-    "on-click": "kitty iwctl"
+    "format-icons": ["󰤯", "󰤟", "󰤢", "󰤥", "󰤨"],
+    "format": "{icon}",
+    "format-wifi": "{icon}",
+    "format-ethernet": "󰀂",
+    "format-disconnected": "󰤮",
+    "tooltip-format-wifi": "{essid} ({frequency} GHz)",
+    "tooltip-format-ethernet": "Connected",
+    "tooltip-format-disconnected": "Disconnected",
+    "interval": 3,
+    "spacing": 1,
+    "on-click": "prometheus-launch-wifi"
   },
-
   "pulseaudio": {
-    "format": "{icon}  {volume}%",
-    "format-muted": "",
+    "format": "{icon}",
+    "on-click": "prometheus-launch-audio",
+    "on-click-right": "pamixer -t",
+    "tooltip-format": "Playing at {volume}%",
+    "scroll-step": 5,
+    "format-muted": "",
     "format-icons": {
-      "default": ["", "", " "]
+      "headphone": "",
+      "headset": "",
+      "default": ["", "", ""]
     }
   },
-
   "backlight": {
-    "format": "{icon}  {percent}%",
-    "format-icons": ["","󰃜", "󰃛", "󰃞","󰃝","󰃟","󰃠"],
-    "tooltip": false
+    "format": "{icon}",
+    "tooltip-format": "{percent} %",
+    "format-icons": ["","󰃜", "󰃛", "󰃞","󰃝","󰃟","󰃠"]
   },
 
   "battery": {
@@ -126,23 +133,4 @@
     "format-alt": "{icon} {time}",
     "format-icons": ["", "", "", "", ""]
   },
-
-  "custom/notification": {
-    "tooltip": false,
-    "format": "{0} {icon}",
-    "format-icons": {
-      "notification": "󰂞",
-      "none": "",
-      "dnd-notification": "󰂛",
-      "dnd-none": "󱏧",
-      "inhibited-notification": "󱏧",
-      "inhibited-none": "󱏧"
-    },
-    "return-type": "json",
-    "exec-if": "which swaync-client",
-    "exec": "swaync-client -swb",
-    "on-click": "swaync-client -t -sw",
-    "on-click-right": "swaync-client -d -sw",
-    "escape": true
-  }
 }

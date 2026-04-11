@@ -6,5 +6,5 @@ mkdir -p ~/.config
 cd ~/.local/share/prometheus/config/
 stow -t ~ *
 
-# Use default bashrc from Omarchy
+# Use default bashrc from Prometheus
 cp ~/.local/share/prometheus/default/bashrc ~/.bashrc

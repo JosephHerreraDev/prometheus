@@ -1,7 +1,7 @@
 #!/bin/bash
 
-# Overwrite the package configuration for /etc/pacman with the Omarchy default of using its dedicated mirrors and repositories, then update all packages.
-# This is used after switching between Omarchy release channels to ensure the right packages for the right channel are available.
+# Overwrite the package configuration for /etc/pacman with the Prometheus default of using its dedicated mirrors and repositories, then update all packages.
+# This is used after switching between Prometheus release channels to ensure the right packages for the right channel are available.
 
 # Take backup of existing files
 sudo cp -f /etc/pacman.conf /etc/pacman.conf.bak
@@ -17,8 +17,8 @@ fi
 echo "Setting channel to $channel"
 echo
 
-sudo cp -f "$OMARCHY_PATH/default/pacman/pacman-$channel.conf" /etc/pacman.conf
-sudo cp -f "$OMARCHY_PATH/default/pacman/mirrorlist-$channel" /etc/pacman.d/mirrorlist
+sudo cp -f "$PROMETHEUS_PATH/default/pacman/pacman-$channel.conf" /etc/pacman.conf
+sudo cp -f "$PROMETHEUS_PATH/default/pacman/mirrorlist-$channel" /etc/pacman.d/mirrorlist
 
 # Reset all package DBs and then update
 sudo pacman -Syyuu --noconfirm

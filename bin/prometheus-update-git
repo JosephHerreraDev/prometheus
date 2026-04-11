@@ -2,9 +2,9 @@
 
 set -e
 
-echo -e "\e[32mUpdate Omarchy\e[0m"
+echo -e "\e[32mUpdate Prometheus\e[0m"
 
 prometheus-update-time
 
-git -C $OMARCHY_PATH pull --autostash
-git -C $OMARCHY_PATH --no-pager diff --check || git -C $OMARCHY_PATH reset --merge
+git -C $PROMETHEUS_PATH pull --autostash
+git -C $PROMETHEUS_PATH --no-pager diff --check || git -C $PROMETHEUS_PATH reset --merge

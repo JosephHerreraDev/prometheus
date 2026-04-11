@@ -1,7 +1,7 @@
 #!/bin/bash
 
-# Launch a floating terminal with the Omarchy logo presentation, then execute the command passed in, and finally end with the prometheus-show-done presentation.
+# Launch a floating terminal with the Prometheus logo presentation, then execute the command passed in, and finally end with the prometheus-show-done presentation.
 # Used by actions such as Update System.
 
 cmd="$*"
-exec setsid uwsm-app -- xdg-terminal-exec --app-id=org.prometheus.terminal --title=Omarchy -e bash -c "prometheus-show-logo; $cmd; if (( \$? != 130 )); then prometheus-show-done; fi"
+exec setsid uwsm-app -- xdg-terminal-exec --app-id=org.prometheus.terminal --title=Prometheus -e bash -c "prometheus-show-logo; $cmd; if (( \$? != 130 )); then prometheus-show-done; fi"

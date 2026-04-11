@@ -1,4 +1,4 @@
-@import "./theme.css";
+@import "../prometheus/current/theme/waybar.css";
 
 /* --- Global Styles --- */
 * {
@@ -11,19 +11,19 @@
 /* --- Container --- */
 #waybar {
   background: transparent;
-  color: @fg;
+  color: @foreground;
   margin: 0;
   font-weight: 500;
 }
 
 /* --- Common module block --- */
 #workspaces, #privacy{
-  background-color: @bg;
-  color: @fg;
+  background-color: @background;
+  color: @foreground;
   padding: 0.3rem 0.7rem;
   margin: 5px 2px;
   border-radius: 6px;
-  border: solid 0.5px @fg-muted;
+  border: solid 0.5px @foreground;
   transition: background-color 0.2s ease-in-out, color 0.2s ease-in-out;
 }
 
@@ -32,28 +32,28 @@
 }
 
 #clock{
-  background-color: @bg-darker;
-  color: @accent;
+  background-color: @background;
+  color: @foreground;
   padding: 0.3rem 0.7rem;
   margin: 5px 2px;
   border-radius: 6px;
-  border: solid 0.5px @fg-muted;
+  border: solid 0.5px @foreground;
   transition: background-color 0.2s ease-in-out, color 0.2s ease-in-out;
 }
 
 #bluetooth, #pulseaudio, #cpu,
 #backlight, #network, #custom-notification, #battery
 {
-  background-color: @bg-darker;
-  color: @fg;
+  background-color: @background;
+  color: @foreground;
   padding: 0.3rem 0.7rem;
   margin: 5px 0;
   border-radius: 0;
   box-shadow: none;
   min-width: 0;
-  color: @fg;
-  border-top: solid 0.5px @fg-muted;
-  border-bottom: solid 0.5px @fg-muted;
+  color: @foreground;
+  border-top: solid 0.5px @foreground;
+  border-bottom: solid 0.5px @foreground;
   transition: background-color 0.2s ease-in-out, color 0.2s ease-in-out;
 }
 
@@ -61,30 +61,30 @@
   margin-left: 2px;
   border-top-left-radius: 6px;
   border-bottom-left-radius: 6px;
-  border-bottom: solid 0.5px @fg-muted;
-  border-left: solid 0.5px @fg-muted;
-  border-top: solid 0.5px @fg-muted;
+  border-bottom: solid 0.5px @foreground-muted;
+  border-left: solid 0.5px @foreground-muted;
+  border-top: solid 0.5px @foreground-muted;
 }
 
-#custom-notification {
+#cpu {
   border-top-right-radius: 6px;
   border-bottom-right-radius: 6px;
   margin-right: 7px;
-  border-bottom: solid 0.5px @fg-muted;
-  border-right: solid 0.5px @fg-muted;
-  border-top: solid 0.5px @fg-muted;
+  border-bottom: solid 0.5px @foreground-muted;
+  border-right: solid 0.5px @foreground-muted;
+  border-top: solid 0.5px @foreground-muted;
 }
 
 #workspaces { padding: 2px; margin-left: 7px; margin-right: 5px; }
 #cpu:hover, #clock:hover,
 #bluetooth:hover, #pulseaudio:hover, #backlight:hover,
 #network:hover, #custom-lock:hover, #custom-notification:hover, #battery:hover {
-  background-color: @bg-hover;
+  background-color: @background;
 }
 
 /* --- Workspaces --- */
 #workspaces button {
-  color: @fg-muted;
+  color: @foreground;
   border-radius: 5px;
   padding: 0.3rem 0.6rem;
   background: transparent;
@@ -93,31 +93,30 @@
 }
 
 #workspaces button.active {
-  color: @accent;
-  background-color: @accent-bg;
-  box-shadow: inset 0 0 0 1px @accent-shadow;
+  color: @foreground;
+  background-color: @background;
+  box-shadow: inset 0 0 0 1px @foreground;
 }
 
 #workspaces button:hover {
-  color: @fg;
-  background: @bg-hover;
+  color: @foreground;
+  background: @background;
 }
 
 /* --- Special modules --- */
-#network.disconnected { color: @error; }
-#battery { color: @success; }
-#battery.warning:not(.charging) { color: @warn; }
-#bluetooth.on, #bluetooth.connected { color: @accent; }
-#custom-notification { color: @accent; }
+#network.disconnected { color: #BF616A; }
+#battery { color: #A3BE8C; }
+#battery.warning:not(.charging) { color: #EBCB8B; }
+#bluetooth.on, #bluetooth.connected { color: @foreground; }
 
 /* --- Tooltip --- */
 tooltip {
-  background-color: @bg;
-  color: @fg;
+  background-color: @background;
+  color: @foreground;
   padding: 5px 12px;
   border-radius: 6px;
-  border: 1px solid @border;
-  box-shadow: 0 4px 12px @shadow;
+  border: 1px solid @foreground;
+  box-shadow: 0 4px 12px @foreground;
   font-size: 12px;
 }
 

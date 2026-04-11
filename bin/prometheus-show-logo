@@ -1,6 +1,6 @@
 #!/bin/bash
 
-# Display the Omarchy logo in the terminal using green color.
+# Display the Prometheus logo in the terminal using green color.
 # Used by various presentation scripts to show branding.
 
 clear

@@ -3,5 +3,5 @@ export SUDO_EDITOR="$EDITOR"
 export BAT_THEME=ansi
 
 # Duplicated from .config/uwsm/env so SSH works too
-export OMARCHY_PATH=$HOME/.local/share/prometheus
-export PATH=$OMARCHY_PATH/bin:$PATH:$HOME/.local/bin
+export PROMETHEUS_PATH=$HOME/.local/share/prometheus
+export PATH=$PROMETHEUS_PATH/bin:$PATH:$HOME/.local/bin
