@@ -10,7 +10,8 @@ xdg-mime default imv.desktop image/bmp
 xdg-mime default imv.desktop image/tiff
 
 # Open PDFs with the Document Viewer
-xdg-mime default org.gnome.Evince.desktop application/pdf
+# xdg-mime default org.gnome.Evince.desktop application/pdf
+xdg-mime default org.pwmt.zathura.desktop application/pdf
 
 # Use Chromium as the default browser
 # xdg-settings set default-web-browser chromium.desktop

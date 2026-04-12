@@ -5,6 +5,8 @@ ttf-cascadia-code-nerd
 yazi
 zathura
 zathura-pdf-poppler
+rofi
+cava
 
 alsa-utils
 bash-completion

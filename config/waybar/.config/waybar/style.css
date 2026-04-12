@@ -2,7 +2,8 @@
 
 /* --- Global Styles --- */
 * {
-  font-family: 'CaskaydiaCove Nerd Font','SF Pro Text','Inter','Segoe UI',sans-serif;
+  font-family:
+    "CaskaydiaCove Nerd Font", "SF Pro Text", "Inter", "Segoe UI", sans-serif;
   font-size: 13px;
   min-height: 0;
   padding: 0;
@@ -17,33 +18,42 @@
 }
 
 /* --- Common module block --- */
-#workspaces, #privacy{
+#workspaces,
+#privacy {
   background-color: @background;
   color: @foreground;
   padding: 0.3rem 0.7rem;
   margin: 5px 2px;
   border-radius: 6px;
   border: solid 0.5px @foreground;
-  transition: background-color 0.2s ease-in-out, color 0.2s ease-in-out;
+  transition:
+    background-color 0.2s ease-in-out,
+    color 0.2s ease-in-out;
 }
 
-#workspaces{
+#workspaces {
   border: none;
 }
 
-#clock{
+#clock {
   background-color: @background;
   color: @foreground;
   padding: 0.3rem 0.7rem;
   margin: 5px 2px;
   border-radius: 6px;
   border: solid 0.5px @foreground;
-  transition: background-color 0.2s ease-in-out, color 0.2s ease-in-out;
+  transition:
+    background-color 0.2s ease-in-out,
+    color 0.2s ease-in-out;
 }
 
-#bluetooth, #pulseaudio, #cpu,
-#backlight, #network, #custom-notification, #battery
-{
+#bluetooth,
+#pulseaudio,
+#cpu,
+#backlight,
+#network,
+#custom-notification,
+#battery {
   background-color: @background;
   color: @foreground;
   padding: 0.3rem 0.7rem;
@@ -54,7 +64,9 @@
   color: @foreground;
   border-top: solid 0.5px @foreground;
   border-bottom: solid 0.5px @foreground;
-  transition: background-color 0.2s ease-in-out, color 0.2s ease-in-out;
+  transition:
+    background-color 0.2s ease-in-out,
+    color 0.2s ease-in-out;
 }
 
 #bluetooth {
@@ -75,10 +87,20 @@
   border-top: solid 0.5px @foreground-muted;
 }
 
-#workspaces { padding: 2px; margin-left: 7px; margin-right: 5px; }
-#cpu:hover, #clock:hover,
-#bluetooth:hover, #pulseaudio:hover, #backlight:hover,
-#network:hover, #custom-lock:hover, #custom-notification:hover, #battery:hover {
+#workspaces {
+  padding: 2px;
+  margin-left: 7px;
+  margin-right: 5px;
+}
+#cpu:hover,
+#clock:hover,
+#bluetooth:hover,
+#pulseaudio:hover,
+#backlight:hover,
+#network:hover,
+#custom-lock:hover,
+#custom-notification:hover,
+#battery:hover {
   background-color: @background;
 }
 
@@ -104,10 +126,19 @@
 }
 
 /* --- Special modules --- */
-#network.disconnected { color: #BF616A; }
-#battery { color: #A3BE8C; }
-#battery.warning:not(.charging) { color: #EBCB8B; }
-#bluetooth.on, #bluetooth.connected { color: @foreground; }
+#network.disconnected {
+  color: #bf616a;
+}
+#battery {
+  color: #a3be8c;
+}
+#battery.warning:not(.charging) {
+  color: #ebcb8b;
+}
+#bluetooth.on,
+#bluetooth.connected {
+  color: @foreground;
+}
 
 /* --- Tooltip --- */
 tooltip {
@@ -119,4 +150,3 @@ tooltip {
   box-shadow: 0 4px 12px @foreground;
   font-size: 12px;
 }
-
