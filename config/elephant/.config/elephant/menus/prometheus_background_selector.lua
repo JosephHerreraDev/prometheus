@@ -1,1 +1,0 @@
-/home/joseph/.local/share/prometheus/default/elephant/prometheus_background_selector.lua

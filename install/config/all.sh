@@ -7,7 +7,6 @@ bash $PROMETHEUS_INSTALL/config/increase-file-watchers.sh
 bash $PROMETHEUS_INSTALL/config/docker.sh
 bash $PROMETHEUS_INSTALL/config/mimetypes.sh
 bash $PROMETHEUS_INSTALL/config/localdb.sh 
-bash $PROMETHEUS_INSTALL/config/walker-elephant.sh 
 bash $PROMETHEUS_INSTALL/config/fast-shutdown.sh 
 bash $PROMETHEUS_INSTALL/config/unmount-fuse.sh 
 bash $PROMETHEUS_INSTALL/config/input-group.sh 

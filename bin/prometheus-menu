@@ -47,19 +47,6 @@ menu() {
     fi
   fi
 
-  # Basic support for old width hints
-  case "$extra" in
-    *"--width 800"*)
-      theme_args=(-theme-str 'window { width: 800px; } listview { lines: 20; }')
-      ;;
-    *"--width 350"*)
-      theme_args=(-theme-str 'window { width: 350px; } listview { lines: 12; }')
-      ;;
-    *)
-      theme_args=(-theme-str 'window { width: 295px; } listview { lines: 12; }')
-      ;;
-  esac
-
   echo -e "$options" | rofi -dmenu -i -p "$prompt" "${selected_row_args[@]}" "${theme_args[@]}" 2>/dev/null
 }
 
@@ -185,10 +172,9 @@ show_style_menu() {
 }
 
 show_theme_menu() {
-  # Replaced walker module view with a simple list generated from prometheus-theme-list if available.
   if command -v prometheus-theme-list >/dev/null 2>&1; then
     local theme
-    theme="$(menu "Theme" "$(prometheus-theme-list)" "--width 800" "$(prometheus-theme-current 2>/dev/null)")"
+    theme="$(menu "Theme" "$(prometheus-theme-list)" "$(prometheus-theme-current 2>/dev/null)")"
 
     if [[ -z $theme || $theme == "CNCLD" ]]; then
       back_to show_style_menu
@@ -202,20 +188,7 @@ show_theme_menu() {
 }
 
 show_background_menu() {
-  # Replaced walker module view with a simple list generated from prometheus-theme-bg-list if available.
-  if command -v prometheus-theme-bg-list >/dev/null 2>&1; then
-    local background
-    background="$(menu "Background" "$(prometheus-theme-bg-list)" "--width 800" "$(prometheus-theme-bg-current 2>/dev/null)")"
-
-    if [[ -z $background || $background == "CNCLD" ]]; then
-      back_to show_style_menu
-    else
-      prometheus-theme-bg-set "$background"
-    fi
-  else
-    notify-send -u normal "Background selector" "prometheus-theme-bg-list not found"
-    back_to show_style_menu
-  fi
+  waypaper
 }
 
 show_font_menu() {

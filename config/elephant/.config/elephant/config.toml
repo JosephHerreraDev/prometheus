@@ -1,5 +1,0 @@
-[providers.desktopapplications]
-enabled = true
-
-[applications]
-runprefix = " "
