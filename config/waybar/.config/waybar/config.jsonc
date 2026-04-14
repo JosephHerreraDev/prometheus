@@ -5,12 +5,9 @@
   "margin-bottom": -10,
   "margin-right": 4,
   "margin-left": 4,
-  "spacing" : 0,
+  "spacing": 0,
 
-  "modules-left": [
-    "hyprland/workspaces",
-    "sway/workspaces"
-  ],
+  "modules-left": ["hyprland/workspaces", "sway/workspaces"],
 
   "modules-center": ["clock"],
 
@@ -18,7 +15,7 @@
     "privacy",
     "bluetooth",
     "network",
-    "pulseaudio", 
+    "pulseaudio",
     "backlight",
     "battery",
     "cpu",
@@ -38,7 +35,7 @@
       "8": "8",
       "9": "9",
       "10": "0",
-      "active": "󱓻"
+      "active": "󱓻",
       //"active": ""
     },
     "persistent-workspaces": {
@@ -46,14 +43,14 @@
       "2": [],
       "3": [],
       "4": [],
-      "5": []
-    }
+      "5": [],
+    },
   },
 
   "cpu": {
     "interval": 5,
     "format": "",
-    "on-click": "prometheus-launch-or-focus-tui btop"
+    "on-click": "prometheus-launch-or-focus-tui btop",
   },
 
   "clock": {
@@ -70,23 +67,23 @@
       {
         "type": "screenshare",
         "tooltip": true,
-        "tooltip-icon-size": 24
-      }
-    ]
+        "tooltip-icon-size": 24,
+      },
+    ],
   },
 
   "bluetooth": {
     "format": "󰂲",
     "format-on": "{icon}",
-    "format-off": "{icon}", 
-    "format-connected":"{icon}",
-    "format-icons":{
-      "on":"󰂯",
+    "format-off": "{icon}",
+    "format-connected": "{icon}",
+    "format-icons": {
+      "on": "󰂯",
       "off": "󰂲",
-      "connected": "󰂱"
+      "connected": "󰂱",
     },
     "on-click": "prometheus-launch-bluetooth",
-    "tooltip-format":"Devices connected: {num_connections}"
+    "tooltip-format": "Devices connected: {num_connections}",
   },
   "network": {
     "format-icons": ["󰤯", "󰤟", "󰤢", "󰤥", "󰤨"],
@@ -99,7 +96,7 @@
     "tooltip-format-disconnected": "Disconnected",
     "interval": 3,
     "spacing": 1,
-    "on-click": "prometheus-launch-wifi"
+    "on-click": "prometheus-launch-wifi",
   },
   "pulseaudio": {
     "format": "{icon}",
@@ -111,26 +108,26 @@
     "format-icons": {
       "headphone": "",
       "headset": "",
-      "default": ["", "", ""]
-    }
+      "default": ["", "", ""],
+    },
   },
   "backlight": {
     "format": "{icon}",
     "tooltip-format": "{percent} %",
-    "format-icons": ["","󰃜", "󰃛", "󰃞","󰃝","󰃟","󰃠"]
+    "format-icons": ["", "󰃜", "󰃛", "󰃞", "󰃝", "󰃟", "󰃠"],
   },
 
   "battery": {
-    "interval":2,
+    "interval": 2,
     "states": {
       "warning": 30,
-      "critical": 15
+      "critical": 15,
     },
     "format": "{icon} {capacity}%",
     "format-full": "{icon} {capacity}%",
     "format-charging": " {capacity}%",
     "format-plugged": " {capacity}%",
     "format-alt": "{icon} {time}",
-    "format-icons": ["", "", "", "", ""]
+    "format-icons": ["", "", "", "", ""],
   },
 }
