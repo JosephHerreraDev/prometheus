@@ -1,0 +1,1 @@
+/home/joseph/.config/prometheus/current/theme/neovim.lua
