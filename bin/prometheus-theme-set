@@ -9,16 +9,8 @@ CURRENT_THEME_PATH="$HOME/.config/prometheus/current/theme"
 NEXT_THEME_PATH="$HOME/.config/prometheus/current/next-theme"
 USER_THEMES_PATH="$HOME/.config/prometheus/themes"
 PROMETHEUS_THEMES_PATH="$PROMETHEUS_PATH/themes"
-AETHER_THEMES_PATH="$HOME/.config/aether/theme"
 
 THEME_NAME=$(echo "$1" | sed -E 's/<[^>]+>//g' | tr '[:upper:]' '[:lower:]' | tr ' ' '-')
-
-# Import current Aether theme as a usable Prometheus theme named "aether"
-if [[ -d "$AETHER_THEMES_PATH" ]]; then
-  rm -rf "$USER_THEMES_PATH/aether"
-  mkdir -p "$USER_THEMES_PATH/aether"
-  cp -r "$AETHER_THEMES_PATH/." "$USER_THEMES_PATH/aether/"
-fi
 
 if [[ ! -d "$PROMETHEUS_THEMES_PATH/$THEME_NAME" ]] && [[ ! -d "$USER_THEMES_PATH/$THEME_NAME" ]]; then
   echo "Theme '$THEME_NAME' does not exist"

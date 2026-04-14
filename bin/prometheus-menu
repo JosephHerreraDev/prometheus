@@ -188,8 +188,55 @@ show_theme_menu() {
 }
 
 show_background_menu() {
-  waypaper
+WALL_DIR="$HOME/.config/prometheus/current/theme/backgrounds"
+
+SELECTED=$(find "$WALL_DIR" -type f \( -iname "*.jpg" -o -iname "*.jpeg" -o -iname "*.png" \) \
+    | while read -r img; do
+        printf '%s\0icon\x1f%s\n' "$img" "$img"
+      done \
+    | rofi -dmenu -i -show-icons -theme "~/.config/rofi/wallpaper.rasi"
+)
+
+[ -z "$SELECTED" ] && exit 0
+
+if ! pgrep -x "awww" > /dev/null; then
+    awww &
+    sleep 0.2
+fi
+
+awww img $SELECTED --transition-fps 60 --transition-type fade --transition-duration 2
+wal -i $SELECTED
 }
+
+show_all_background_menu() {
+WALL_DIR="$HOME/Pictures/wallpapers/general"
+
+SELECTED=$(find "$WALL_DIR" -type f \( -iname "*.jpg" -o -iname "*.jpeg" -o -iname "*.png" \) \
+    | while read -r img; do
+        printf '%s\0icon\x1f%s\n' "$img" "$img"
+      done \
+    | rofi -dmenu -i -show-icons -theme "~/.config/rofi/wallpaper.rasi"
+)
+
+[ -z "$SELECTED" ] && exit 0
+
+if ! pgrep -x "awww" > /dev/null; then
+    awww &
+    sleep 0.2
+fi
+
+awww img $SELECTED --transition-fps 60 --transition-type fade --transition-duration 2
+# generate colors.toml from wallust from wallpaper
+
+# extract with something like prometheus-theme-set-templates
+# copy into => 
+  # rm -rf "$USER_THEMES_PATH/prometheus"
+  # mkdir -p "$USER_THEMES_PATH/prometheus"
+#set created theme =>
+  # prometheus-theme-set prometheus
+
+}
+
 
 show_font_menu() {
   local theme
@@ -279,6 +326,7 @@ go_to_menu() {
     *apps*) rofi -show drun "Launch…" ;;
     *trigger*) show_trigger_menu ;;
     *background*) show_background_menu ;;
+    *wallpaper*) show_all_background_menu ;;
     *capture*) show_capture_menu ;;
     *style*) show_style_menu ;;
     *theme*) show_theme_menu ;;
