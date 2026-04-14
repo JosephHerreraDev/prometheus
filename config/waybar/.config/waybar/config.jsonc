@@ -22,7 +22,7 @@
   ],
 
   "hyprland/workspaces": {
-    "format": "{icon}",
+    "format": "{icon} {windows}",
     "format-icons": {
       "default": "",
       "1": "1",
@@ -37,6 +37,24 @@
       "10": "0",
       "active": "󱓻",
       //"active": ""
+    },
+    "window-rewrite": {
+      "class<brave-browser>": "󰖟",
+      "class<kitty>": "",
+      "class<code>": "",
+      "class<Spotify>": "",
+      "class<obsidian>": "",
+      "class<org.pwmt.zathura>": "󰈦",
+      "class<org.gnome.Evince>": "󰈦",
+      "class<com.obsproject.Studio>": "",
+      "class<mpv>": "",
+      "class<org.prometheus.bluetui>": "󰂯",
+      "class<org.prometheus.impala>": "󰤢",
+      "class<org.prometheus.wiremix>": "",
+      "class<org.prometheus.btop>": "",
+      "class<org.prometheus.bash>": "󰣇",
+      "class<org.prometheus.cliamp>": "󰐹",
+      "class<waypaper>": "󰸉",
     },
     "persistent-workspaces": {
       "1": [],
