@@ -60,5 +60,6 @@ prometheus-theme-set-gnome
 prometheus-theme-set-browser
 prometheus-theme-set-vscode
 prometheus-theme-set-obsidian
+prometheus-theme-set-spotify
 
 prometheus-hook theme-set "$THEME_NAME"

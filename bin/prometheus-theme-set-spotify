@@ -1,0 +1,224 @@
+#!/bin/bash
+
+set -euo pipefail
+
+input_file="$HOME/.config/prometheus/current/theme/colors.toml"
+
+success() {
+    echo -e "\e[32m[SUCCESS]\e[0m $1"
+}
+
+skipped() {
+    echo -e "\033[0;34m[SKIPPED]\e[0m $1 not found. Skipping.."
+    exit 0
+}
+
+error() {
+    echo -e "\e[31m[ERROR]\e[0m $1"
+    exit 1
+}
+
+if [[ ! -f "$input_file" ]]; then
+    error "colors.toml not found at $input_file"
+fi
+
+extract_color() {
+    local color_name="$1"
+    awk -v color="$color_name" '
+        $1 == color && /=/ {
+            if (match($0, /#([0-9a-fA-F]{6})/)) {
+                print substr($0, RSTART + 1, 6)
+                exit
+            }
+        }
+    ' "$input_file"
+}
+
+hex_to_rgb_csv() {
+    local hex="$1"
+    local r=$((16#${hex:0:2}))
+    local g=$((16#${hex:2:2}))
+    local b=$((16#${hex:4:2}))
+    echo "$r,$g,$b"
+}
+
+if ! command -v spicetify >/dev/null 2>&1; then
+    skipped "Spicetify"
+fi
+
+mkdir -p "$HOME/.config/spicetify/Themes/prometheus"
+
+background="$(extract_color "background")"
+foreground="$(extract_color "foreground")"
+accent="$(extract_color "accent")"
+selection_background="$(extract_color "selection_background")"
+selection_foreground="$(extract_color "selection_foreground")"
+color0="$(extract_color "color0")"
+color1="$(extract_color "color1")"
+color2="$(extract_color "color2")"
+color3="$(extract_color "color3")"
+color4="$(extract_color "color4")"
+color5="$(extract_color "color5")"
+color6="$(extract_color "color6")"
+color7="$(extract_color "color7")"
+color8="$(extract_color "color8")"
+
+accent_rgb="$(hex_to_rgb_csv "$accent")"
+
+cat > "$HOME/.config/spicetify/Themes/prometheus/color.ini" << EOF
+[base]
+main                = ${background}
+player              = ${background}
+card                = ${color0}
+main-elevated       = ${color0}
+sidebar             = ${background}
+shadow              = ${background}
+selected-row        = ${selection_background}
+button              = ${accent}
+button-active       = ${color2}
+button-disabled     = ${color8}
+tab-active          = ${accent}
+notification        = ${accent}
+notification-error  = ${color1}
+misc                = ${color8}
+text                = ${foreground}
+subtext             = ${color7}
+highlight           = ${accent}
+highlight-elevated  = ${color0}
+EOF
+
+cat > "$HOME/.config/spicetify/Themes/prometheus/user.css" << EOF
+:root,
+.encore-dark-theme,
+.encore-base-set,
+.encore-inverted-light-set {
+    --spice-rgb-selected-row: ${accent_rgb};
+    --background-highlight: rgba(${accent_rgb}, 0.16) !important;
+    --background-press: rgba(${accent_rgb}, 0.24) !important;
+}
+
+body,
+.Root__top-container,
+.Root__nav-bar,
+.Root__main-view,
+.main-view-container,
+.main-yourLibraryX-libraryContainer,
+.main-nowPlayingView-section,
+.main-trackList-trackListHeaderRow,
+.main-trackList-trackListRow,
+.x-categoryCard-CategoryCard-background {
+    border-radius: 12px !important;
+}
+
+.main-nowPlayingBar-nowPlayingBar {
+    background: #${background} !important;
+    border-top: 1px solid rgba(${accent_rgb}, 0.18) !important;
+}
+
+.main-nowPlayingBar-container {
+    background: #${color0} !important;
+    border-radius: 14px !important;
+    margin: 8px !important;
+    padding: 8px 12px !important;
+    color: #${foreground} !important;
+}
+
+.main-topBar-background,
+.main-home-filterChipsSection,
+.main-actionBarBackground-background,
+.main-entityHeader-backgroundColor {
+    background: transparent !important;
+    box-shadow: none !important;
+}
+
+.main-card-card,
+.main-genreCard-card,
+.main-trackList-trackListRow:hover,
+.x-downloadButton-DownloadButton,
+.Button-buttonTertiary-medium-useBrowserDefaultFocusStyle {
+    background: rgba(${accent_rgb}, 0.08) !important;
+    transition: background 0.15s ease !important;
+}
+
+.main-card-card:hover,
+.main-genreCard-card:hover,
+.main-trackList-trackListRow:hover,
+.x-downloadButton-DownloadButton:hover,
+.Button-buttonTertiary-medium-useBrowserDefaultFocusStyle:hover {
+    background: rgba(${accent_rgb}, 0.16) !important;
+}
+
+.main-playButton-PlayButton,
+.main-genericButton-button,
+.Button-sc-1dqy6lx-0 {
+    border-radius: 999px !important;
+}
+
+.main-playButton-PlayButton {
+    background: #${accent} !important;
+    color: #${selection_foreground} !important;
+}
+
+.main-playButton-PlayButton:hover {
+    transform: none !important;
+    filter: brightness(1.08);
+}
+
+.main-home-homeHeader {
+    display: none !important;
+}
+
+.progress-bar,
+.playback-bar__progress-time-elapsed,
+.volume-bar {
+    --fg-color: #${accent} !important;
+}
+
+.progress-bar__bg,
+.volume-bar__bg {
+    border-radius: 999px !important;
+}
+
+.main-trackList-selected,
+.main-trackList-trackListRow[aria-selected="true"] {
+    background: rgba(${accent_rgb}, 0.18) !important;
+}
+
+.main-sidebarItem-linkActive,
+.main-yourLibraryX-navLinkActive {
+    color: #${accent} !important;
+}
+
+a,
+button,
+span {
+    text-shadow: none !important;
+}
+EOF
+
+spicetify config current_theme prometheus >/dev/null
+spicetify config color_scheme base >/dev/null
+
+spotify_was_running=false
+if pgrep -x spotify >/dev/null 2>&1; then
+    spotify_was_running=true
+fi
+
+if [[ "$spotify_was_running" == true ]]; then
+    spicetify apply >/dev/null 2>&1 &
+else
+    setsid bash -c '
+        spicetify apply >/dev/null 2>&1 &
+        for i in {1..250}; do
+            if pgrep -x spotify >/dev/null 2>&1; then
+                sleep 0.2
+                killall -9 spotify >/dev/null 2>&1
+                exit 0
+            fi
+            sleep 0.1
+        done
+    ' >/dev/null 2>&1 < /dev/null &
+fi
+
+success "Spotify theme updated!"
+exit 0
