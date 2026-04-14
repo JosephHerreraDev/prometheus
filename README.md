@@ -1,4 +1,5 @@
 # Prometheus
+
 A modern arch rice based on [Omarchy](https://omarchy.org/).
 
 ## Installation
@@ -11,6 +12,13 @@ A modern arch rice based on [Omarchy](https://omarchy.org/).
 > This is only for a fresh arch linux install
 
 ## Features
+
 - Hyprland window manager
 - Theme switching
 - Total personalization
+
+## TODO
+
+- Fix nvim config
+- Shortcut guide
+- Theme switch based on background
