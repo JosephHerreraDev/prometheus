@@ -1,4 +1,6 @@
-#!/bin/bash
+#!/usr/bin/env bash
+
+set -e
 
 ansi_art=$(cat <<'EOF'
     ___       ___       ___       ___       ___       ___       ___       ___       ___       ___   
@@ -14,12 +16,15 @@ EOF
 clear
 echo -e "\n$ansi_art\n"
 
-#rm -rf ~/.local/share/prometheus/
-#git clone "https://github.com/${OMARCHY_REPO}.git" ~/.local/share/prometheus >/dev/null
+DEST="$HOME/.local/share"
+TARGET="$DEST/prometheus"
 
-cd ~/.local/share/prometheus
-git fetch
-cd -
+command -v git >/dev/null 2>&1 || { echo "git is required"; exit 1; }
+
+rm -rf "$TARGET"
+mkdir -p "$DEST"
+git clone https://github.com/JosephHerreraDev/prometheus.git "$TARGET"
+cd "$TARGET"
 
 echo -e "\nInstallation starting..."
-source ~/.local/share/prometheus/install.sh
+./install.sh

@@ -4,9 +4,9 @@ A modern arch rice based on [Omarchy](https://omarchy.org/).
 
 ## Installation
 
-1. Clone in `~/.local/share/`
-2. `cd prometheus`
-3. `./boot.sh`.
+```bash
+curl -sSL https://raw.githubusercontent.com/JosephHerreraDev/prometheus/main/boot.sh | bash
+```
 
 > [!WARNING]
 > This is only for a fresh arch linux install
