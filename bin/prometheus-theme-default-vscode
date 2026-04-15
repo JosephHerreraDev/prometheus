@@ -1,0 +1,19 @@
+#!/usr/bin/env bash
+
+DIR="$1"
+
+if [ -z "$DIR" ]; then
+  echo "Usage: $0 <directory>"
+  exit 1
+fi
+
+mkdir -p "$DIR"
+
+FILE="$DIR/vscode.json"
+
+cat > "$FILE" <<EOF
+{
+  "name": "Andromeda", 
+  "extension": "eliverlara.andromeda"
+}
+EOF

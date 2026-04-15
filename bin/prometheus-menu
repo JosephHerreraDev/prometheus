@@ -207,6 +207,7 @@ show_background_menu() {
 show_all_background_menu() {
     WALL_DIR="$HOME/Pictures/wallpapers/general"
     DEST_DIR="$HOME/.config/prometheus/themes/prometheus/backgrounds"
+    JSON_DIR="$HOME/.config/prometheus/themes/prometheus"
 
     rm -rf "$DEST_DIR"
     mkdir -p "$DEST_DIR"
@@ -226,6 +227,7 @@ SELECTED=$(find "$WALL_DIR" -type f \( -iname "*.jpg" -o -iname "*.jpeg" -o -ina
     }
 
     wallust run -s "$SELECTED" 
+    prometheus-theme-default-vscode "$JSON_DIR"
     prometheus-theme-set prometheus 
     
     if ! pgrep -x "swaybg" > /dev/null; then
