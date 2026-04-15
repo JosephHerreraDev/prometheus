@@ -55,6 +55,7 @@
       "class<org.prometheus.bash>": "󰣇",
       "class<org.prometheus.cliamp>": "󰐹",
       "class<waypaper>": "󰸉",
+      "class<org.prometheus.terminal>": "",
     },
     "persistent-workspaces": {
       "1": [],
