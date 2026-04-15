@@ -40,6 +40,7 @@
     },
     "window-rewrite": {
       "class<brave-browser>": "󰖟",
+      "class<brave-browser-beta>": "󰖟",
       "class<kitty>": "",
       "class<code>": "",
       "class<Spotify>": "",
