@@ -22,3 +22,5 @@ A modern arch rice based on [Omarchy](https://omarchy.org/).
 - Fix nvim config
 - Shortcut guide
 - Theme switch based on background
+
+![Alt](https://repobeats.axiom.co/api/embed/89b4da8d5979097d5ac1f51c474ab093c2918532.svg "Repobeats analytics image")
