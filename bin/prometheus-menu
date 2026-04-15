@@ -188,24 +188,20 @@ show_theme_menu() {
 }
 
 show_background_menu() {
-WALL_DIR="$HOME/.config/prometheus/current/theme/backgrounds"
+    local WALL_DIR="$HOME/.config/prometheus/current/theme/backgrounds"
+    local SELECTED
 
-SELECTED=$(find "$WALL_DIR" -type f \( -iname "*.jpg" -o -iname "*.jpeg" -o -iname "*.png" \) \
-    | while read -r img; do
-        printf '%s\0icon\x1f%s\n' "$img" "$img"
-      done \
-    | rofi -dmenu -i -show-icons -theme "~/.config/rofi/wallpaper.rasi"
-)
+    SELECTED=$(
+        find "$WALL_DIR" -type f \( -iname "*.jpg" -o -iname "*.jpeg" -o -iname "*.png" \) \
+        | while IFS= read -r img; do
+            printf '%s\0icon\x1f%s\n' "$img" "$img"
+          done \
+        | rofi -dmenu -i -show-icons -theme "$HOME/.config/rofi/wallpaper.rasi"
+    )
 
-[ -z "$SELECTED" ] && exit 0
-
-if ! pgrep -x "awww" > /dev/null; then
-    awww &
-    sleep 0.2
-fi
-
-awww img $SELECTED --transition-fps 60 --transition-type fade --transition-duration 2
-wal -i $SELECTED
+    [ -z "$SELECTED" ] && return 0
+    
+    swaybg -i "$SELECTED" -m fill
 }
 
 show_all_background_menu() {
@@ -220,12 +216,9 @@ SELECTED=$(find "$WALL_DIR" -type f \( -iname "*.jpg" -o -iname "*.jpeg" -o -ina
 
 [ -z "$SELECTED" ] && exit 0
 
-if ! pgrep -x "awww" > /dev/null; then
-    awww &
-    sleep 0.2
-fi
 
-awww img $SELECTED --transition-fps 60 --transition-type fade --transition-duration 2
+    swaybg -i "$SELECTED" -m fill
+
 # generate colors.toml from wallust from wallpaper
 
 # extract with something like prometheus-theme-set-templates
