@@ -8,6 +8,9 @@ zathura-pdf-poppler
 rofi
 cava
 hyprlock
+steam
+prismlauncher
+tetro-tui
 
 alsa-utils
 bash-completion

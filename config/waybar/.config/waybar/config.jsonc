@@ -56,6 +56,9 @@
       "class<org.prometheus.cliamp>": "󰐹",
       "class<waypaper>": "󰸉",
       "class<org.prometheus.terminal>": "",
+      "class<steam>": "",
+      "class<opennow-stable>": "󰖺",
+      "class<org.prismlauncher.PrismLauncher>": "󰍳",
     },
     "persistent-workspaces": {
       "1": [],
