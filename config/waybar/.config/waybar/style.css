@@ -133,9 +133,6 @@
 #network.disconnected {
   color: @error;
 }
-#battery {
-  color: @success;
-}
 #battery.warning:not(.charging) {
   color: @warn;
 }
