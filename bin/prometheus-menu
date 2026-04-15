@@ -205,7 +205,11 @@ show_background_menu() {
 }
 
 show_all_background_menu() {
-WALL_DIR="$HOME/Pictures/wallpapers/general"
+    WALL_DIR="$HOME/Pictures/wallpapers/general"
+    DEST_DIR="$HOME/.config/prometheus/themes/prometheus/backgrounds"
+
+    rm -rf "$DEST_DIR"
+    mkdir -p "$DEST_DIR"
 
 SELECTED=$(find "$WALL_DIR" -type f \( -iname "*.jpg" -o -iname "*.jpeg" -o -iname "*.png" \) \
     | while read -r img; do
@@ -216,18 +220,17 @@ SELECTED=$(find "$WALL_DIR" -type f \( -iname "*.jpg" -o -iname "*.jpeg" -o -ina
 
 [ -z "$SELECTED" ] && exit 0
 
+   cp -f -- "$SELECTED" "$DEST_DIR/$(basename "$SELECTED")" || {
+        echo "copy failed"
+        return 1
+    }
 
-    swaybg -i "$SELECTED" -m fill
-
-# generate colors.toml from wallust from wallpaper
-
-# extract with something like prometheus-theme-set-templates
-# copy into => 
-  # rm -rf "$USER_THEMES_PATH/prometheus"
-  # mkdir -p "$USER_THEMES_PATH/prometheus"
-#set created theme =>
-  # prometheus-theme-set prometheus
-
+    wallust run -s "$SELECTED" 
+    prometheus-theme-set prometheus 
+    
+    if ! pgrep -x "swaybg" > /dev/null; then
+        swaybg -i "$SELECTED" -m fill &
+    fi
 }
 
 

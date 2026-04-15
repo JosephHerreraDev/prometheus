@@ -17,10 +17,10 @@ A modern arch rice based on [Omarchy](https://omarchy.org/).
 - Theme switching
 - Total personalization
 
-## TODO
+## Roadmap
 
-- Fix nvim config
 - Shortcut guide
-- Theme switch based on background
+
+## Analytics
 
 ![Alt](https://repobeats.axiom.co/api/embed/89b4da8d5979097d5ac1f51c474ab093c2918532.svg "Repobeats analytics image")
