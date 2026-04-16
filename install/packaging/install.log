@@ -1,9 +1,0 @@
-[18:43:57 2026-04-11] FETCHING Version 2.43.1
-[18:43:57 2026-04-11] DOWNLOADING https://github.com/spicetify/cli/releases/download/v2.43.1/spicetify-2.43.1-linux-amd64.tar.gz
-[18:44:05 2026-04-11] EXTRACTING /home/joseph/.spicetify/spicetify.tar.gz
-[18:44:05 2026-04-11] SETTING EXECUTABLE PERMISSIONS TO /home/joseph/.spicetify/spicetify
-[18:44:05 2026-04-11] REMOVING /home/joseph/.spicetify/spicetify.tar.gz
-[18:44:05 2026-04-11] spicetify path already set in /home/joseph/.bashrc, continuing...
-[18:44:05 2026-04-11] spicetify path already set in /home/joseph/.bash_profile, continuing...
-[18:44:05 2026-04-11] spicetify v2.43.1 was installed successfully to /home/joseph/.spicetify
-[18:44:05 2026-04-11] Run 'spicetify --help' to get started
