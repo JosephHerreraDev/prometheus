@@ -26,7 +26,7 @@ color_space = "lch"
 # softlight - softlight16 - softlightcomp - softlightcomp16
 # saliencedark - saliencedarkbalanced - saliencedarkdistributed - saliencedarklow (each has the 16 variations)
 # salienceligh - saliencelightbalanced - saliencelightdistributed - saliencelightlow (each has the 16 variations)
-palette = "saliencedark"
+palette = "darkcomp16"
 #palette = "dark16"
 
 # Ensures a "readable contrast" (OPTIONAL, disabled by default)
