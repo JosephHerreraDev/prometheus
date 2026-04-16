@@ -70,7 +70,6 @@ pamixer
 #pinta
 playerctl
 plocate
-plymouth
 power-profiles-daemon
 python-gobject
 python-poetry-core
