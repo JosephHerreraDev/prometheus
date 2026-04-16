@@ -188,7 +188,11 @@ show_theme_menu() {
 }
 
 show_background_menu() {
-    local WALL_DIR="$HOME/.config/prometheus/current/theme/backgrounds"
+THEME_NAME=$(cat "$HOME/.config/prometheus/current/theme.name" 2>/dev/null)
+
+    local WALL_DIR="$HOME/Pictures/wallpapers/themes/$THEME_NAME"
+    [ -z "$THEME_NAME" ] || [ ! -d "$WALL_DIR" ] && return
+    
     local SELECTED
 
     SELECTED=$(

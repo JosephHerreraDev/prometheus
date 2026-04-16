@@ -3,8 +3,8 @@
 # Cycles through the background images available
 
 THEME_NAME=$(cat "$HOME/.config/prometheus/current/theme.name" 2>/dev/null)
-THEME_BACKGROUNDS_PATH="$HOME/.config/prometheus/current/theme/backgrounds/"
-USER_BACKGROUNDS_PATH="$HOME/.config/prometheus/backgrounds/$THEME_NAME/"
+THEME_BACKGROUNDS_PATH="$HOME/Pictures/wallpapers/themes/$THEME_NAME/"
+USER_BACKGROUNDS_PATH="$HOME/.config/prometheus/current/theme/backgrounds/"
 CURRENT_BACKGROUND_LINK="$HOME/.config/prometheus/current/background"
 
 mapfile -d '' -t BACKGROUNDS < <(find -L "$USER_BACKGROUNDS_PATH" "$THEME_BACKGROUNDS_PATH" -maxdepth 1 -type f -print0 2>/dev/null | sort -z)
