@@ -1,0 +1,105 @@
+@import "~/.config/prometheus/current/theme/theme.rasi"
+
+/*****----- Configuration -----*****/
+configuration {
+    show-icons:                 true;
+}
+
+/*****----- Main Window -----*****/
+window {
+    location:                   center;
+    anchor:                     center;
+    border-radius:              16px;
+    width: 70%;
+    padding:                    16px;
+    border:                     2px solid;
+    border-color:                @selected;
+    background-color:           @background;
+}
+
+/*****----- Main Layout -----*****/
+mainbox {
+    orientation:                vertical;
+    spacing:                    0px;
+    children:                   [ "inputbar", "listbox" ];
+    background-color:           @background;
+}
+
+/*****----- Search / Inputbar -----*****/
+inputbar {
+    children:                   [ "entry" ];
+    background-color:           @background-alt;
+    border-radius:              10px;
+    padding:                    6px 12px;
+    margin:                     0px 0px 12px 0px;
+}
+
+entry {
+    background-color:           transparent;
+    text-color:                 @foreground;
+    placeholder-color:          @foreground;
+    placeholder:                "Search wallpapers...";
+    font:                       "JetBrains Mono Nerd Font 10";
+    vertical-align:             0.5;
+}
+
+/*****----- Listbox -----*****/
+listbox {
+    orientation:                horizontal;
+    children:                   [ "listview" ];
+    background-color:           transparent;
+}
+
+/*****----- Listview: Wallpaper Grid -----*****/
+listview {
+    columns:                    4;
+    lines:                      2;
+    layout:                     vertical;
+    fixed-columns:              true;
+    fixed-height:               true;
+    dynamic:                    false;
+    spacing:                    8px;
+    padding:                    4px;
+    background-color:           transparent;
+    scrollbar:                  false;
+}
+
+/*****----- Element Styling -----*****/
+element {
+    orientation:                vertical;
+    background-color:           @background-alt;
+    border-radius:              10px;
+    cursor:                     pointer;
+}
+
+element normal.normal {
+    background-color:           @background-alt;
+}
+
+element selected.normal {
+    background-color:           transparent;
+    border:                     2px solid;
+    border-color:                @selected;
+    border-radius:              10px;
+}
+
+element alternate.normal {
+    background-color:           @background-alt;
+}
+
+/*****----- Icon (Thumbnail) -----*****/
+element-icon {
+    size:                       240px;
+    background-color:           transparent;
+    horizontal-align: 0.5;
+    border-radius: 12px;
+    cursor:                     inherit;
+}
+
+/*****----- Text Label -----*****/
+element-text {
+    background-color:           transparent;
+    text-color:                 transparent;
+    width: 0px;
+    height: 0px; 
+}
