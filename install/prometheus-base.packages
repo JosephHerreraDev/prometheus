@@ -4,13 +4,17 @@ stow
 ttf-cascadia-code-nerd
 yazi
 zathura
-zathura-pdf-poppler
+zathura-pdf-mupdf
 rofi
 cava
 hyprlock
 steam
 prismlauncher
 tetro-tui
+cliphist 
+wl-clipboard
+trash-cli
+beets
 
 alsa-utils
 bash-completion
@@ -96,7 +100,6 @@ whois
 wireless-regdb
 wiremix
 wireplumber
-wl-clipboard
 woff2-font-awesome
 xdg-desktop-portal-gtk
 xdg-desktop-portal-hyprland
