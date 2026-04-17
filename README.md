@@ -17,10 +17,6 @@ curl -sSL https://raw.githubusercontent.com/JosephHerreraDev/prometheus/main/boo
 - Theme switching
 - Total personalization
 
-## Roadmap
-
-- Shortcut guide
-
 ## Analytics
 
 ![Alt](https://repobeats.axiom.co/api/embed/89b4da8d5979097d5ac1f51c474ab093c2918532.svg "Repobeats analytics image")
