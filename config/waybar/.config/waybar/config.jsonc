@@ -55,6 +55,7 @@
       "class<org.prometheus.btop>": "",
       "class<org.prometheus.bash>": "󰣇",
       "class<org.prometheus.cliamp>": "󰐹",
+      "class<org.prometheus.kew>": "󰝚",
       "class<waypaper>": "󰸉",
       "class<org.prometheus.terminal>": "",
       "class<steam>": "",
