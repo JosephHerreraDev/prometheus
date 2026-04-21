@@ -13,6 +13,7 @@
 
   "modules-right": [
     "privacy",
+    "custom/now-playing",
     "bluetooth",
     "network",
     "pulseaudio",
@@ -75,6 +76,13 @@
     "interval": 5,
     "format": "",
     "on-click": "prometheus-launch-or-focus-tui btop",
+  },
+  "custom/now-playing": {
+    "exec": "prometheus-waybar-now-playing",
+    "interval": 2,
+    "format": "{text}",
+    "return-type": "json",
+    "tooltip": "{tooltip}",
   },
 
   "clock": {

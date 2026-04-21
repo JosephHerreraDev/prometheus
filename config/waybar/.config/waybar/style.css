@@ -34,7 +34,8 @@
   border: solid 0.5px @background-darker;
 }
 
-#clock {
+#clock,
+#custom-now-playing {
   background-color: @background-darker;
   color: @accent;
   padding: 0.3rem 0.7rem;
