@@ -5,17 +5,10 @@ ttf-cascadia-code-nerd
 yazi
 zathura
 zathura-pdf-mupdf
-rofi
 cava
 hyprlock
-steam
-prismlauncher
-tetro-tui
 cliphist 
 wl-clipboard
-trash-cli
-beets
-kew
 
 alsa-utils
 bash-completion
@@ -43,7 +36,6 @@ fcitx5-qt
 fd
 fontconfig
 fzf
-github-cli
 grim
 gpu-screen-recorder
 gum
@@ -51,7 +43,6 @@ hyprland
 hyprland-guiutils
 hyprpicker
 hyprsunset
-imagemagick
 impala
 imv
 inxi
@@ -72,7 +63,6 @@ nvim
 obs-studio
 obsidian
 pamixer
-#pinta
 playerctl
 plocate
 power-profiles-daemon
@@ -92,11 +82,9 @@ tldr
 tree-sitter-cli
 tmux
 ttf-jetbrains-mono-nerd
-#typora
 ufw
 unzip
 usage
-waybar
 whois
 wireless-regdb
 wiremix
