@@ -1,6 +1,6 @@
 import QtQuick
 
-import "Bar" as Bar
+import "bar" as Bar
 
 Bar.Bar{
 

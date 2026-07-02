@@ -10,13 +10,11 @@ import "../theme"
 Pill {
   id: root
 
-  property QtObject nord: Nord {}
-
   property var shellScreen
   property var hyprMonitor: shellScreen ? Hyprland.monitorFor(shellScreen) : null
 
-  implicitWidth: row.implicitWidth + 14
-  implicitHeight: 28
+  implicitWidth: row.implicitWidth + root.margin * 2
+  implicitHeight: row.implicitHeight + root.margin * 2
 
   function appClass(toplevel) {
     if (toplevel.wayland && toplevel.wayland.appId) {
@@ -60,12 +58,12 @@ Pill {
     id: row
 
     anchors.centerIn: parent
-    spacing: 5
+    spacing: 1
 
     Repeater {
       model: Hyprland.workspaces
 
-      Rectangle {
+      BarButton {
         id: workspaceButton
 
         required property var modelData
@@ -79,21 +77,21 @@ Pill {
         Layout.preferredWidth: content.implicitWidth + 12
         Layout.preferredHeight: 24
 
-        radius: 6
-
-        color: workspace.focused
-          ? root.nord.nord2
+        buttonColor: workspace.focused
+          ? root.theme.color2
           : workspace.active
-            ? root.nord.nord1
-            : root.nord.nord0
+            ? root.theme.color1
+            : root.theme.color0
 
-        border.width: workspace.focused ? 2 : 1
+        buttonBorderWidth: workspace.focused ? 2 : 1
 
-        border.color: workspace.focused
-          ? root.nord.nord8
+        buttonBorderColor: workspace.focused
+          ? root.theme.color8
           : workspace.active
-            ? root.nord.nord10
-            : root.nord.nord3
+            ? root.theme.color10
+            : root.theme.color3
+
+        onClicked: workspaceButton.workspace.activate()
 
         RowLayout {
           id: content
@@ -110,8 +108,8 @@ Pill {
               : Font.Medium
 
             color: workspaceButton.workspace.focused
-              ? root.nord.nord6
-              : root.nord.nord4
+              ? root.theme.color6
+              : root.theme.color4
           }
 
           Repeater {
@@ -129,28 +127,23 @@ Pill {
                 anchors.fill: parent
                 source: root.iconSource(modelData)
 
-                // Hidden because MultiEffect draws the tinted version.
-                visible: false
+                visible: true
+                opacity: 0.0
               }
 
               MultiEffect {
-                anchors.fill: parent
+                anchors.fill: rawIcon
                 source: rawIcon
 
                 colorization: 1.0
                 colorizationColor: workspaceButton.workspace.focused
-                  ? root.nord.nord8
-                  : root.nord.nord4
+                  ? root.theme.color8
+                  : root.theme.color4
+
+                brightness: 1.0
               }
             }
           }
-        }
-
-        MouseArea {
-          anchors.fill: parent
-          cursorShape: Qt.PointingHandCursor
-
-          onClicked: workspaceButton.workspace.activate()
         }
       }
     }
