@@ -1,6 +1,6 @@
 # Prometheus
 
-A modern arch rice based on [Omarchy](https://omarchy.org/).
+A modern arch rice based.
 
 <img width="1080" height="607" alt="hyprland-beatiful-minimalist-rice-for-productivity-v0-7p2dbxa4euvg1" src="https://github.com/user-attachments/assets/22cf90f4-6319-40ab-83d3-d0473d70f90d" />
 
@@ -16,13 +16,14 @@ curl -sSL https://raw.githubusercontent.com/JosephHerreraDev/prometheus/main/boo
 ```
 
 > [!WARNING]
-> This is only for a fresh arch linux install
+> This is only for a fresh arch linux install, with the selection of hyprland from archinstall
 
 ## Features
 
 - Hyprland window manager
 - Theme switching
 - Total personalization
+- Quickshell based
 
 ## Analytics
 
