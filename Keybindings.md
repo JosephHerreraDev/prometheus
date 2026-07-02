@@ -44,7 +44,7 @@
 | `SUPER + ALT + ENTER` | Launch terminal with tmux |
 | `SUPER + E`           | Launch file explorer      |
 | `SUPER + B`           | Launch web browser        |
-| `SUPER + O`           | Launch obsidian           |
+| `SUPER + N`           | Launch obsidian           |
 | `SUPER + C`           | Launch vs code            |
 | `SUPER + M`           | Launch spotify            |
 
