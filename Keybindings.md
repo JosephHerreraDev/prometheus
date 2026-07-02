@@ -47,7 +47,6 @@
 | `SUPER + O`           | Launch obsidian           |
 | `SUPER + C`           | Launch vs code            |
 | `SUPER + M`           | Launch spotify            |
-| `SUPER + SHIFT + M`   | Launch cliamp             |
 
 # Tmux
 
