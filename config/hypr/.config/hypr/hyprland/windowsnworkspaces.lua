@@ -56,12 +56,12 @@ hl.window_rule({
 
 hl.window_rule({
 	name = "browser-bind",
-	match = { class = "brave-origin" },
+	match = { class = browser },
 	workspace = "2"
 })
 
 hl.window_rule({
 	name = "notes-bind",
-	match = { class = "obsidian" },
+	match = { class = notes },
 	workspace = "4"
 })
