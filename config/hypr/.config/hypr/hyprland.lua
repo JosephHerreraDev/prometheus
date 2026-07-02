@@ -1,0 +1,10 @@
+require("hyprland/monitors")
+require("hyprland/programs")
+require("hyprland/autostart")
+require("hyprland/variables")
+require("hyprland/permissions")
+require("hyprland/looknfeel")
+require("hyprland/input")
+require("hyprland/keybindings")
+require("hyprland/windowsnworkspaces")
+
