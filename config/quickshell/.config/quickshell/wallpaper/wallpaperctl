@@ -1,0 +1,68 @@
+#!/bin/bash
+
+set -euo pipefail
+
+WALLPAPER_DIR="${PROMETHEUS_WALLPAPER_DIR:-$HOME/Pictures/wallpapers/general}"
+
+is_image() {
+  case "${1,,}" in
+    *.jpg|*.jpeg|*.png|*.webp|*.jxl) return 0 ;;
+    *) return 1 ;;
+  esac
+}
+
+list_wallpapers() {
+  if [[ ! -d $WALLPAPER_DIR ]]; then
+    return 0
+  fi
+
+  find "$WALLPAPER_DIR" -type f \
+    \( -iname '*.jpg' -o -iname '*.jpeg' -o -iname '*.png' -o -iname '*.webp' -o -iname '*.jxl' \) \
+    -print \
+    | sort
+}
+
+apply_wallpaper() {
+  local wallpaper="${1:-}"
+
+  if [[ -z $wallpaper || ! -f $wallpaper ]] || ! is_image "$wallpaper"; then
+    notify-send -u critical "Wallpaper" "Selected file is not a supported image" >/dev/null 2>&1 || true
+    return 1
+  fi
+
+  if ! command -v hyprctl >/dev/null 2>&1; then
+    notify-send -u critical "Wallpaper" "hyprctl is not available" >/dev/null 2>&1 || true
+    return 1
+  fi
+
+  if ! pgrep -x hyprpaper >/dev/null 2>&1; then
+    hyprpaper >/dev/null 2>&1 &
+    sleep 0.2
+  fi
+
+  mapfile -t monitors < <(hyprctl monitors | awk '/^Monitor / { print $2 }')
+
+  if (( ${#monitors[@]} == 0 )); then
+    notify-send -u critical "Wallpaper" "No Hyprland monitors found" >/dev/null 2>&1 || true
+    return 1
+  fi
+
+  hyprctl hyprpaper preload "$wallpaper" >/dev/null || true
+
+  for monitor in "${monitors[@]}"; do
+    hyprctl hyprpaper wallpaper "$monitor, $wallpaper, cover" >/dev/null
+  done
+}
+
+case "${1:-}" in
+  list)
+    list_wallpapers
+    ;;
+  apply)
+    apply_wallpaper "${2:-}"
+    ;;
+  *)
+    echo "Usage: $0 {list|apply <path>}" >&2
+    exit 2
+    ;;
+esac

@@ -39,6 +39,13 @@ hl.window_rule({
 -- })
 -- overlayLayerRule:set_enabled(false)
 
+hl.layer_rule({
+    name  = "blur-powermenu",
+    match = { namespace = "^prometheus-powermenu$" },
+
+    blur = true,
+})
+
 -- Hyprland-run windowrule
 hl.window_rule({
     name  = "move-hyprland-run",
