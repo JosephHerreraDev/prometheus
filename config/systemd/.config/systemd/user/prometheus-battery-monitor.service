@@ -1,9 +1,0 @@
-[Unit]
-Description=Prometheus Battery Monitor Check
-After=graphical-session.target
-
-[Service]
-Type=oneshot
-ExecStart=%h/.local/share/prometheus/bin/prometheus-battery-monitor
-Environment=DISPLAY=:0
-LogLevelMax=warning
