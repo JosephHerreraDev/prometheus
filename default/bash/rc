@@ -1,6 +1,0 @@
-source ~/.local/share/prometheus/default/bash/envs
-source ~/.local/share/prometheus/default/bash/shell
-source ~/.local/share/prometheus/default/bash/aliases
-source ~/.local/share/prometheus/default/bash/functions
-source ~/.local/share/prometheus/default/bash/init
-[[ $- == *i* ]] && bind -f ~/.local/share/prometheus/default/bash/inputrc

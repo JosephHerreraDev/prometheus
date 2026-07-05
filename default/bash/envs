@@ -1,7 +1,0 @@
-# Editor used by CLI
-export SUDO_EDITOR="$EDITOR"
-export BAT_THEME=ansi
-
-# Duplicated from .config/uwsm/env so SSH works too
-export PROMETHEUS_PATH=$HOME/.local/share/prometheus
-export PATH=$PROMETHEUS_PATH/bin:$PATH:$HOME/.local/bin
