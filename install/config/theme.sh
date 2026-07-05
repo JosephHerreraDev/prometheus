@@ -1,24 +1,18 @@
-# Set links for Nautilus action icons
-#sudo ln -snf /usr/share/icons/Adwaita/symbolic/actions/go-previous-symbolic.svg /usr/share/icons/Yaru/scalable/actions/go-previous-symbolic.svg
-#sudo ln -snf /usr/share/icons/Adwaita/symbolic/actions/go-next-symbolic.svg /usr/share/icons/Yaru/scalable/actions/go-next-symbolic.svg
-
 # Setup user theme folder
 mkdir -p ~/.config/prometheus/themes
 
 # Set initial theme
-prometheus-theme-set "Tokyo Night"
-rm -rf ~/.config/chromium/SingletonLock # otherwise archiso will own the chromium singleton
+prometheus-theme-set "Nord"
 
 # Set specific app links for current theme
 mkdir -p ~/.config/btop/themes
 ln -snf ~/.config/prometheus/current/theme/btop.theme ~/.config/btop/themes/current.theme
-
-mkdir -p ~/.config/mako
-ln -snf ~/.config/prometheus/current/theme/mako.ini ~/.config/mako/config
-
-# Add managed policy directories for Chromium and Brave for theme changes
-sudo mkdir -p /etc/chromium/policies/managed
-sudo chmod a+rw /etc/chromium/policies/managed
-
-sudo mkdir -p /etc/brave/policies/managed
-sudo chmod a+rw /etc/brave/policies/managed
+mkdir -p ~/.config/quickshell
+if [[ -d ~/.config/quickshell/theme && ! -L ~/.config/quickshell/theme ]]; then
+  rm -f ~/.config/quickshell/theme/Theme.qml
+  rmdir ~/.config/quickshell/theme 2>/dev/null || {
+    echo "Could not replace ~/.config/quickshell/theme; directory is not empty"
+    exit 1
+  }
+fi
+ln -snf ~/.config/prometheus/current/theme ~/.config/quickshell/theme
