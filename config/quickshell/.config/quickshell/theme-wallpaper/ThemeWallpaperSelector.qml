@@ -20,7 +20,7 @@ Scope {
   property int focusRequest: 0
 
   readonly property int animationDuration: 140
-  readonly property string helper: Quickshell.shellPath("wallpaper/wallpaperctl")
+  readonly property string helper: Quickshell.shellPath("theme-wallpaper/theme-wallpaperctl")
 
   function screenFocused(screen) {
     const monitor = Hyprland.monitorFor(screen)
@@ -33,10 +33,10 @@ Scope {
     hideTimer.stop()
     mounted = true
     opened = false
-    menuState.active = "wallpaper"
+    menuState.active = "theme-wallpaper"
     refresh()
     Qt.callLater(function() {
-      if (menuState.active === "wallpaper") {
+      if (menuState.active === "theme-wallpaper") {
         opened = true
         requestFocus()
       }
@@ -46,7 +46,7 @@ Scope {
   function close(): void {
     opened = false
     hideTimer.restart()
-    if (menuState.active === "wallpaper") {
+    if (menuState.active === "theme-wallpaper") {
       menuState.active = ""
     }
   }
@@ -60,7 +60,7 @@ Scope {
   }
 
   function refresh(): void {
-    statusText = "Loading wallpapers..."
+    statusText = "Loading theme wallpapers..."
     listProcess.exec([helper, "list"])
   }
 
@@ -126,7 +126,7 @@ Scope {
   }
 
   IpcHandler {
-    target: "wallpaper"
+    target: "themewallpaper"
 
     function open(): void { root.open() }
     function close(): void { root.close() }
@@ -137,11 +137,11 @@ Scope {
     target: menuState
 
     function onActiveChanged(): void {
-      if (menuState.active === "wallpaper") {
+      if (menuState.active === "theme-wallpaper") {
         hideTimer.stop()
         root.mounted = true
         Qt.callLater(function() {
-          if (menuState.active === "wallpaper") {
+          if (menuState.active === "theme-wallpaper") {
             root.opened = true
             root.requestFocus()
           }
@@ -175,7 +175,7 @@ Scope {
         root.wallpapers = root.parseList(text)
         root.selectedIndex = root.wallpapers.length > 0 ? 0 : -1
         root.statusText = root.wallpapers.length === 0
-          ? "No wallpapers found in ~/Pictures/wallpapers/general"
+          ? "No wallpapers found for the current theme"
           : ""
       }
     }
@@ -185,7 +185,7 @@ Scope {
 
       onStreamFinished: {
         if (text.length > 0) {
-          console.warn("Wallpaper list failed: " + text)
+          console.warn("Theme wallpaper list failed: " + text)
         }
       }
     }
@@ -194,7 +194,7 @@ Scope {
       if (exitCode !== 0) {
         root.wallpapers = []
         root.selectedIndex = -1
-        root.statusText = "Could not load wallpapers"
+        root.statusText = "Could not load theme wallpapers"
       }
     }
   }
@@ -216,6 +216,7 @@ Scope {
 
       WlrLayershell.layer: WlrLayer.Overlay
       WlrLayershell.keyboardFocus: WlrKeyboardFocus.Exclusive
+      WlrLayershell.namespace: "prometheus-theme-wallpaper"
 
       anchors {
         top: true
@@ -306,17 +307,12 @@ Scope {
           anchors.margins: 14
           spacing: 12
 
-          RowLayout {
+          Text {
+            text: "Theme Wallpapers"
+            color: root.theme.color6
+            font.pixelSize: 16
+            font.weight: Font.DemiBold
             Layout.fillWidth: true
-            spacing: 10
-
-            Text {
-              text: "Wallpapers"
-              color: root.theme.color6
-              font.pixelSize: 16
-              font.weight: Font.DemiBold
-              Layout.fillWidth: true
-            }
           }
 
           Text {
@@ -346,10 +342,6 @@ Scope {
             currentIndex: root.selectedIndex
             boundsBehavior: Flickable.StopAtBounds
 
-            ScrollBar.vertical: ScrollBar {
-              policy: grid.contentHeight > grid.height ? ScrollBar.AsNeeded : ScrollBar.AlwaysOff
-            }
-
             Keys.onPressed: function(event) {
               if (event.key === Qt.Key_Right) {
                 root.moveSelection(1)
@@ -374,6 +366,10 @@ Scope {
                 root.close()
                 event.accepted = true
               }
+            }
+
+            ScrollBar.vertical: ScrollBar {
+              policy: grid.contentHeight > grid.height ? ScrollBar.AsNeeded : ScrollBar.AlwaysOff
             }
 
             delegate: Rectangle {

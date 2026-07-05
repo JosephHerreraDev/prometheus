@@ -9,8 +9,47 @@ import "../theme"
 Scope {
   id: root
 
+  property QtObject menuState
   property QtObject theme: Theme {}
   property bool opened: false
+  property bool mounted: false
+  property int selectedIndex: 0
+  property int focusRequest: 0
+  property var actions: [
+    {
+      label: "Lock",
+      detail: "Lock session",
+      command: "hyprlock"
+    },
+    {
+      label: "Suspend",
+      detail: "Sleep",
+      command: "systemctl suspend"
+    },
+    {
+      label: "Hibernate",
+      detail: "Disk sleep",
+      command: "systemctl hibernate"
+    },
+    {
+      label: "Logout",
+      detail: "End session",
+      command: "prometheus-system-logout"
+    },
+    {
+      label: "Restart",
+      detail: "Reboot",
+      command: "systemctl reboot --no-wall"
+    },
+    {
+      label: "Shutdown",
+      detail: "Power off",
+      command: "systemctl poweroff --no-wall",
+      danger: true
+    }
+  ]
+
+  readonly property int animationDuration: 140
 
   function screenFocused(screen) {
     const monitor = Hyprland.monitorFor(screen)
@@ -20,15 +59,33 @@ Scope {
   }
 
   function open(): void {
-    opened = true
+    hideTimer.stop()
+    mounted = true
+    opened = false
+    menuState.active = "powermenu"
+    selectedIndex = 0
+    Qt.callLater(function() {
+      if (menuState.active === "powermenu") {
+        opened = true
+        requestFocus()
+      }
+    })
   }
 
   function close(): void {
     opened = false
+    hideTimer.restart()
+    if (menuState.active === "powermenu") {
+      menuState.active = ""
+    }
   }
 
   function toggle(): void {
-    opened = !opened
+    if (opened) {
+      close()
+    } else {
+      open()
+    }
   }
 
   function run(command) {
@@ -40,12 +97,58 @@ Scope {
     Quickshell.execDetached(["sh", "-c", command])
   }
 
+  function requestFocus(): void {
+    focusRequest += 1
+  }
+
+  function moveSelection(delta) {
+    selectedIndex = Math.max(0, Math.min(selectedIndex + delta, actions.length - 1))
+  }
+
+  function runSelected(): void {
+    if (selectedIndex >= 0 && selectedIndex < actions.length) {
+      run(actions[selectedIndex].command)
+    }
+  }
+
   IpcHandler {
     target: "powermenu"
 
     function open(): void { root.open() }
     function close(): void { root.close() }
     function toggle(): void { root.toggle() }
+  }
+
+  Connections {
+    target: menuState
+
+    function onActiveChanged(): void {
+      if (menuState.active === "powermenu") {
+        hideTimer.stop()
+        root.mounted = true
+        Qt.callLater(function() {
+          if (menuState.active === "powermenu") {
+            root.opened = true
+            root.requestFocus()
+          }
+        })
+      } else if (root.opened) {
+        root.opened = false
+        hideTimer.restart()
+      }
+    }
+  }
+
+  Timer {
+    id: hideTimer
+
+    interval: root.animationDuration
+    repeat: false
+    onTriggered: {
+      if (!root.opened) {
+        root.mounted = false
+      }
+    }
   }
 
   Variants {
@@ -57,7 +160,7 @@ Scope {
       required property var modelData
 
       screen: modelData
-      visible: root.opened && root.screenFocused(modelData)
+      visible: root.mounted && root.screenFocused(modelData)
       color: "#00000000"
       aboveWindows: true
       focusable: true
@@ -74,9 +177,41 @@ Scope {
         right: true
       }
 
+      onVisibleChanged: {
+        if (visible) {
+          focusPanel()
+        }
+      }
+
+      function focusPanel(): void {
+        Qt.callLater(function() {
+          panel.forceActiveFocus()
+        })
+      }
+
+      Connections {
+        target: root
+
+        function onFocusRequestChanged(): void {
+          if (window.visible) {
+            window.focusPanel()
+          }
+        }
+      }
+
       Rectangle {
+        id: scrim
+
         anchors.fill: parent
         color: "#66000000"
+        opacity: root.opened ? 1.0 : 0.0
+
+        Behavior on opacity {
+          NumberAnimation {
+            duration: root.animationDuration
+            easing.type: Easing.OutCubic
+          }
+        }
 
         MouseArea {
           anchors.fill: parent
@@ -88,6 +223,8 @@ Scope {
       Rectangle {
         id: panel
 
+        opacity: root.opened ? 1.0 : 0.0
+        scale: root.opened ? 1.0 : 0.96
         width: Math.min(500, window.width - 40)
         implicitHeight: content.implicitHeight + 32
         anchors.centerIn: parent
@@ -96,6 +233,43 @@ Scope {
         color: root.theme.color0
         border.width: 1
         border.color: root.theme.color2
+        focus: true
+
+        Keys.onPressed: function(event) {
+          if (event.key === Qt.Key_Right) {
+            root.moveSelection(1)
+            event.accepted = true
+          } else if (event.key === Qt.Key_Left) {
+            root.moveSelection(-1)
+            event.accepted = true
+          } else if (event.key === Qt.Key_Down) {
+            root.moveSelection(window.width < 520 ? 2 : 3)
+            event.accepted = true
+          } else if (event.key === Qt.Key_Up) {
+            root.moveSelection(window.width < 520 ? -2 : -3)
+            event.accepted = true
+          } else if (event.key === Qt.Key_Return || event.key === Qt.Key_Enter) {
+            root.runSelected()
+            event.accepted = true
+          } else if (event.key === Qt.Key_Escape) {
+            root.close()
+            event.accepted = true
+          }
+        }
+
+        Behavior on opacity {
+          NumberAnimation {
+            duration: root.animationDuration
+            easing.type: Easing.OutCubic
+          }
+        }
+
+        Behavior on scale {
+          NumberAnimation {
+            duration: root.animationDuration
+            easing.type: Easing.OutCubic
+          }
+        }
 
         MouseArea {
           anchors.fill: parent
@@ -131,52 +305,21 @@ Scope {
             rowSpacing: 10
 
             Repeater {
-              model: [
-                {
-                  label: "Lock",
-                  detail: "Lock session",
-                  command: "hyprlock"
-                },
-                {
-                  label: "Suspend",
-                  detail: "Sleep",
-                  command: "systemctl suspend"
-                },
-                {
-                  label: "Hibernate",
-                  detail: "Disk sleep",
-                  command: "systemctl hibernate"
-                },
-                {
-                  label: "Logout",
-                  detail: "End session",
-                  command: "uwsm stop"
-                },
-                {
-                  label: "Restart",
-                  detail: "Reboot",
-                  command: "systemctl reboot --no-wall"
-                },
-                {
-                  label: "Shutdown",
-                  detail: "Power off",
-                  command: "systemctl poweroff --no-wall",
-                  danger: true
-                }
-              ]
+              model: root.actions
 
               Rectangle {
                 id: actionButton
 
+                required property int index
                 required property var modelData
 
                 Layout.fillWidth: true
                 Layout.preferredHeight: 74
 
                 radius: 8
-                color: actionMouse.containsMouse ? root.theme.color1 : root.theme.color2
+                color: actionButton.index === root.selectedIndex || actionMouse.containsMouse ? root.theme.color1 : root.theme.color2
                 border.width: 1
-                border.color: actionMouse.containsMouse
+                border.color: actionButton.index === root.selectedIndex || actionMouse.containsMouse
                   ? (modelData.danger === true ? root.theme.color11 : root.theme.color8)
                   : root.theme.color3
 
@@ -208,6 +351,7 @@ Scope {
                   anchors.fill: parent
                   hoverEnabled: true
                   cursorShape: Qt.PointingHandCursor
+                  onEntered: root.selectedIndex = actionButton.index
                   onClicked: root.run(actionButton.modelData.command)
                 }
               }

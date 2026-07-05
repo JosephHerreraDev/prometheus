@@ -1,0 +1,165 @@
+#!/bin/bash
+
+set -euo pipefail
+
+data_dirs() {
+  printf '%s\n' "${XDG_DATA_HOME:-$HOME/.local/share}"
+
+  local dirs="${XDG_DATA_DIRS:-/usr/local/share:/usr/share}"
+  local dir
+  IFS=':' read -ra parts <<< "$dirs"
+  for dir in "${parts[@]}"; do
+    [[ -n $dir ]] && printf '%s\n' "$dir"
+  done
+}
+
+icon_dirs() {
+  printf '%s\n' "$HOME/.local/share/icons" "$HOME/.icons" "$HOME/.local/share/pixmaps"
+
+  local dir
+  while IFS= read -r dir; do
+    printf '%s\n' "$dir/icons" "$dir/pixmaps"
+  done < <(data_dirs)
+}
+
+clean_value() {
+  local value="${1#*=}"
+  value="${value//\\n/ }"
+  value="${value//\\t/ }"
+  value="${value//	/ }"
+  printf '%s' "$value"
+}
+
+declare -A icon_paths
+
+build_icon_cache() {
+  local dir file name base
+  while IFS= read -r dir; do
+    [[ -d $dir ]] || continue
+
+    while IFS= read -r -d '' file; do
+      name="${file##*/}"
+      base="${name%.*}"
+
+      if [[ -z ${icon_paths[$base]+set} ]]; then
+        icon_paths[$base]="$file"
+      fi
+    done < <(
+      find -L "$dir" -type f \
+        \( -iname '*.svg' -o -iname '*.png' -o -iname '*.xpm' -o -iname '*.jpg' -o -iname '*.jpeg' -o -iname '*.webp' \) \
+        -print0 2>/dev/null
+    )
+  done < <(icon_dirs)
+}
+
+resolve_icon() {
+  local icon="$1"
+  local icon_name
+
+  [[ -n $icon ]] || return 0
+
+  if [[ $icon = /* ]]; then
+    [[ -f $icon ]] && printf '%s' "$icon"
+    return 0
+  fi
+
+  icon_name="${icon##*/}"
+  icon_name="${icon_name%.*}"
+
+  if [[ -n ${icon_paths[$icon_name]+set} ]]; then
+    printf '%s' "${icon_paths[$icon_name]}"
+  fi
+}
+
+desktop_id_for() {
+  local file="$1"
+  local data_dir app_dir relative
+
+  while IFS= read -r data_dir; do
+    app_dir="$data_dir/applications"
+    case "$file" in
+      "$app_dir"/*)
+        relative="${file#"$app_dir"/}"
+        printf '%s' "${relative//\//-}"
+        return 0
+        ;;
+    esac
+  done < <(data_dirs)
+
+  printf '%s' "${file##*/}"
+}
+
+list_apps() {
+  build_icon_cache
+
+  local data_dir app_dir file id type name generic_name comment icon keywords no_display hidden
+
+  while IFS= read -r data_dir; do
+    app_dir="$data_dir/applications"
+    [[ -d $app_dir ]] || continue
+
+    while IFS= read -r -d '' file; do
+      id="$(desktop_id_for "$file")"
+      type=""
+      name=""
+      generic_name=""
+      comment=""
+      icon=""
+      keywords=""
+      no_display="false"
+      hidden="false"
+
+      while IFS= read -r line || [[ -n $line ]]; do
+        case "$line" in
+          "[Desktop Entry]") continue ;;
+          "["*) break ;;
+          Type=*) type="$(clean_value "$line")" ;;
+          Name=*) name="$(clean_value "$line")" ;;
+          GenericName=*) generic_name="$(clean_value "$line")" ;;
+          Comment=*) comment="$(clean_value "$line")" ;;
+          Icon=*) icon="$(clean_value "$line")" ;;
+          Keywords=*) keywords="$(clean_value "$line")" ;;
+          NoDisplay=*) no_display="$(clean_value "$line")" ;;
+          Hidden=*) hidden="$(clean_value "$line")" ;;
+        esac
+      done < "$file"
+
+      [[ $type == "Application" ]] || continue
+      [[ $no_display != "true" && $hidden != "true" ]] || continue
+      [[ -n $name ]] || continue
+
+      printf '%s\t%s\t%s\t%s\t%s\t%s\n' \
+        "$id" \
+        "$name" \
+        "$generic_name" \
+        "$comment" \
+        "$(resolve_icon "$icon")" \
+        "$keywords"
+    done < <(find -L "$app_dir" -type f -name '*.desktop' -print0 2>/dev/null)
+  done < <(data_dirs) | sort -f -t $'\t' -k2,2
+}
+
+launch_app() {
+  local id="${1:-}"
+
+  [[ -n $id ]] || exit 2
+
+  if gtk-launch "$id" >/dev/null 2>&1; then
+    return 0
+  fi
+
+  gtk-launch "${id%.desktop}" >/dev/null 2>&1
+}
+
+case "${1:-}" in
+  list)
+    list_apps
+    ;;
+  launch)
+    launch_app "${2:-}"
+    ;;
+  *)
+    echo "Usage: $0 {list|launch <desktop-id>}" >&2
+    exit 2
+    ;;
+esac

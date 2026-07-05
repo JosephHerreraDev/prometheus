@@ -1,0 +1,54 @@
+#!/bin/bash
+
+set -euo pipefail
+
+THEME_NAME="$(cat "$HOME/.config/prometheus/current/theme.name" 2>/dev/null || true)"
+THEME_WALLPAPER_DIR="$HOME/Pictures/wallpapers/themes/$THEME_NAME"
+USER_WALLPAPER_DIR="$HOME/.config/prometheus/current/theme/backgrounds"
+
+is_image() {
+  case "${1,,}" in
+    *.jpg|*.jpeg|*.png|*.webp|*.jxl) return 0 ;;
+    *) return 1 ;;
+  esac
+}
+
+list_wallpapers() {
+  local dirs=()
+
+  [[ -d "$USER_WALLPAPER_DIR" ]] && dirs+=("$USER_WALLPAPER_DIR")
+  [[ -d "$THEME_WALLPAPER_DIR" ]] && dirs+=("$THEME_WALLPAPER_DIR")
+
+  if (( ${#dirs[@]} == 0 )); then
+    return 0
+  fi
+
+  find -L "${dirs[@]}" -maxdepth 1 -type f \
+    \( -iname '*.jpg' -o -iname '*.jpeg' -o -iname '*.png' -o -iname '*.webp' -o -iname '*.jxl' \) \
+    -print \
+    | sort -u
+}
+
+apply_wallpaper() {
+  local wallpaper="${1:-}"
+
+  if [[ -z $wallpaper || ! -f $wallpaper ]] || ! is_image "$wallpaper"; then
+    notify-send -u critical "Theme wallpaper" "Selected file is not a supported image" >/dev/null 2>&1 || true
+    return 1
+  fi
+
+  prometheus-theme-bg-set "$wallpaper"
+}
+
+case "${1:-}" in
+  list)
+    list_wallpapers
+    ;;
+  apply)
+    apply_wallpaper "${2:-}"
+    ;;
+  *)
+    echo "Usage: $0 {list|apply <path>}" >&2
+    exit 2
+    ;;
+esac

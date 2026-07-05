@@ -86,6 +86,10 @@ Pill {
         {
           icon: "../icons/cpu.svg",
           command: "kitty btop"
+        },
+        {
+          icon: "../icons/arch.svg",
+          command: "kitty --hold fastfetch"
         }
       ]
 
