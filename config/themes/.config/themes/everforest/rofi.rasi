@@ -1,9 +1,0 @@
-* {
-    background:     #2D353BFF;  /* main background */
-    background-alt: #232A2EFF;  /* darker panels */
-    foreground:     #D3C6AAFF;  /* main text */
-    selected:       #A7C080FF;  /* green accent (selected item) */
-    active:         #83C092FF;  /* active element */
-    urgent:         #E67E80FF;  /* red for warnings */
-}
-
