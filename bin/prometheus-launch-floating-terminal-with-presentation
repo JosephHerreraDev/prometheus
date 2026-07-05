@@ -4,4 +4,4 @@
 # Used by actions such as Update System.
 
 cmd="$*"
-exec setsid uwsm-app -- xdg-terminal-exec --app-id=org.prometheus.terminal --title=Prometheus -e bash -c "prometheus-show-logo; $cmd; if (( \$? != 130 )); then prometheus-show-done; fi"
+exec setsid uwsm-app -- kitty --app-id=org.prometheus.terminal --title=Prometheus -e bash -c "prometheus-show-logo; $cmd; if (( \$? != 130 )); then prometheus-show-done; fi"

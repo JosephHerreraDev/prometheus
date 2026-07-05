@@ -1,0 +1,94 @@
+#!/bin/bash
+
+# Restart Quickshell so generated theme QML is reloaded.
+
+set -u
+
+RUNTIME_DIR="${XDG_RUNTIME_DIR:-/tmp}"
+LOCK_DIR="$RUNTIME_DIR/prometheus-restart-quickshell.lock"
+QUICKSHELL_RUNTIME_DIR="$RUNTIME_DIR/quickshell"
+
+if ! mkdir "$LOCK_DIR" 2>/dev/null; then
+  exit 0
+fi
+
+cleanup() {
+  rmdir "$LOCK_DIR" 2>/dev/null || true
+}
+
+trap cleanup EXIT
+
+quickshell_running() {
+  local pid
+
+  while read -r pid; do
+    if kill -0 "$pid" 2>/dev/null; then
+      return 0
+    fi
+  done < <(qs list 2>/dev/null | sed -nE 's/^[[:space:]]*Process ID:[[:space:]]*([0-9]+).*/\1/p')
+
+  return 1
+}
+
+cleanup_stale_instances() {
+  local instance=""
+  local pid=""
+  local line
+
+  while IFS= read -r line; do
+    if [[ "$line" =~ ^Instance[[:space:]]+([^:]+): ]]; then
+      instance="${BASH_REMATCH[1]}"
+    elif [[ "$line" =~ Process[[:space:]]ID:[[:space:]]([0-9]+) ]]; then
+      pid="${BASH_REMATCH[1]}"
+
+      if ! kill -0 "$pid" 2>/dev/null; then
+        rm -f "$QUICKSHELL_RUNTIME_DIR/by-pid/$pid" 2>/dev/null || true
+
+        if [[ -n "$instance" ]]; then
+          rm -rf "$QUICKSHELL_RUNTIME_DIR/by-id/$instance" 2>/dev/null || true
+          find "$QUICKSHELL_RUNTIME_DIR/by-shell" -mindepth 2 -maxdepth 2 -name "$instance" -exec rm -f {} + 2>/dev/null || true
+        fi
+      fi
+    fi
+  done < <(qs list 2>/dev/null)
+}
+
+wait_for_quickshell_exit() {
+  local attempts="${1:-30}"
+
+  for _ in $(seq 1 "$attempts"); do
+    if ! quickshell_running; then
+      return 0
+    fi
+
+    sleep 0.1
+  done
+
+  return 1
+}
+
+terminate_quickshell() {
+  local signal="$1"
+  local pid
+
+  while read -r pid; do
+    kill "-$signal" "$pid" 2>/dev/null || true
+  done < <(qs list 2>/dev/null | sed -nE 's/^[[:space:]]*Process ID:[[:space:]]*([0-9]+).*/\1/p')
+}
+
+terminate_quickshell TERM
+cleanup_stale_instances
+
+if ! wait_for_quickshell_exit 30; then
+  terminate_quickshell KILL
+
+  cleanup_stale_instances
+  wait_for_quickshell_exit 20 || true
+fi
+
+if quickshell_running; then
+  echo "Quickshell did not stop cleanly; not starting another instance" >&2
+  exit 1
+fi
+
+setsid qs --no-duplicate --daemonize >/dev/null 2>&1 &

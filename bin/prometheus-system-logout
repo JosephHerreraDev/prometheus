@@ -3,9 +3,25 @@
 # Logout command that first closes all application windows (thus giving them a chance to save state),
 # then stops the session, returning to the SDDM login screen.
 
+logout_session() {
+  if command -v uwsm >/dev/null 2>&1 && uwsm stop >/dev/null 2>&1; then
+    exit 0
+  fi
+
+  if command -v hyprctl >/dev/null 2>&1 && hyprctl dispatch exit >/dev/null 2>&1; then
+    exit 0
+  fi
+
+  if command -v loginctl >/dev/null 2>&1 && [[ -n ${XDG_SESSION_ID:-} ]]; then
+    loginctl terminate-session "$XDG_SESSION_ID" >/dev/null 2>&1
+  fi
+}
+
 # Schedule the session stop after closing windows (detached from terminal)
-nohup bash -c "sleep 2 && uwsm stop" >/dev/null 2>&1 &
+nohup bash -c "$(declare -f logout_session); sleep 2; logout_session" >/dev/null 2>&1 &
 
 # Now close all windows
-prometheus-hyprland-window-close-all
+if command -v prometheus-hyprland-window-close-all >/dev/null 2>&1; then
+  prometheus-hyprland-window-close-all
+fi
 sleep 1 # Allow apps like Chrome to shutdown correctly

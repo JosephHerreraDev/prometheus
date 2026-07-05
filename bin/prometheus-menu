@@ -51,7 +51,14 @@ menu() {
 }
 
 terminal() {
-  xdg-terminal-exec --app-id=org.prometheus.terminal "$@"
+  if command -v xdg-terminal-exec >/dev/null 2>&1; then
+    xdg-terminal-exec --app-id=org.prometheus.terminal "$@"
+  elif command -v kitty >/dev/null 2>&1; then
+    kitty --app-id=org.prometheus.terminal -e "$@"
+  else
+    notify-send -u critical "No supported terminal found" "Install xdg-terminal-exec or kitty."
+    return 1
+  fi
 }
 
 present_terminal() {
@@ -205,7 +212,7 @@ THEME_NAME=$(cat "$HOME/.config/prometheus/current/theme.name" 2>/dev/null)
 
     [ -z "$SELECTED" ] && return 0
     
-    swaybg -i "$SELECTED" -m fill
+    prometheus-theme-bg-set "$SELECTED"
 }
 
 show_all_background_menu() {
@@ -234,9 +241,7 @@ SELECTED=$(find "$WALL_DIR" -type f \( -iname "*.jpg" -o -iname "*.jpeg" -o -ina
     prometheus-theme-default-vscode "$JSON_DIR"
     prometheus-theme-set prometheus 
     
-    if ! pgrep -x "swaybg" > /dev/null; then
-        swaybg -i "$SELECTED" -m fill &
-    fi
+    prometheus-theme-bg-set "$SELECTED"
 }
 
 

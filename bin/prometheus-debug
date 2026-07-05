@@ -1,7 +1,6 @@
 #!/bin/bash
 
 # Return exhaustive debugging information about the system to help diagnose problems.
-
 NO_SUDO=false
 PRINT_ONLY=false
 
@@ -86,7 +85,14 @@ case "$ACTION" in
     fi
     ;;
   "View log")
-    less "$LOG_FILE"
+    if [[ -n ${PAGER:-} ]]; then
+      read -r -a PAGER_CMD <<< "$PAGER"
+      "${PAGER_CMD[@]}" "$LOG_FILE"
+    elif command -v less >/dev/null 2>&1; then
+      less "$LOG_FILE"
+    else
+      cat "$LOG_FILE"
+    fi
     ;;
   "Save in current directory")
     cp "$LOG_FILE" "./prometheus-debug.log"

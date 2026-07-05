@@ -10,9 +10,37 @@ fi
 BACKGROUND="$1"
 CURRENT_BACKGROUND_LINK="$HOME/.config/prometheus/current/background"
 
+if [[ ! -f $BACKGROUND ]]; then
+  echo "Background '$BACKGROUND' does not exist" >&2
+  exit 1
+fi
+
 # Create symlink to the new background
 ln -nsf "$BACKGROUND" "$CURRENT_BACKGROUND_LINK"
 
-# Kill existing swaybg and start new one
-pkill -x swaybg
-setsid uwsm-app -- swaybg -i "$CURRENT_BACKGROUND_LINK" -m fill >/dev/null 2>&1 &
+if ! command -v hyprctl >/dev/null 2>&1; then
+  exit 0
+fi
+
+if ! pgrep -x hyprpaper >/dev/null 2>&1 && command -v hyprpaper >/dev/null 2>&1; then
+  if command -v uwsm-app >/dev/null 2>&1; then
+    setsid uwsm-app -- hyprpaper >/dev/null 2>&1 &
+  else
+    setsid hyprpaper >/dev/null 2>&1 &
+  fi
+  sleep 0.2
+fi
+
+mapfile -t MONITORS < <(hyprctl monitors | awk '/^Monitor / { print $2 }')
+
+if (( ${#MONITORS[@]} == 0 )); then
+  exit 0
+fi
+
+hyprctl hyprpaper preload "$BACKGROUND" >/dev/null 2>&1 || true
+
+for MONITOR in "${MONITORS[@]}"; do
+  hyprctl hyprpaper wallpaper "$MONITOR, $BACKGROUND, cover" >/dev/null 2>&1
+done
+
+hyprctl hyprpaper unload unused >/dev/null 2>&1 || true

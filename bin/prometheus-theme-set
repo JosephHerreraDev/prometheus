@@ -36,22 +36,7 @@ mv "$NEXT_THEME_PATH" "$CURRENT_THEME_PATH"
 echo "$THEME_NAME" > "$HOME/.config/prometheus/current/theme.name"
 
 prometheus-theme-bg-next
-
-if pgrep -x waybar >/dev/null; then
-  prometheus-restart-waybar
-fi
-
-prometheus-restart-swayosd
 prometheus-restart-terminal
-prometheus-restart-hyprctl
 prometheus-restart-btop
-prometheus-restart-opencode
-prometheus-restart-mako
-
-prometheus-theme-set-gnome
-prometheus-theme-set-browser
-prometheus-theme-set-vscode
-prometheus-theme-set-obsidian
-prometheus-theme-set-spotify
-
-prometheus-hook theme-set "$THEME_NAME"
+prometheus-restart-quickshell
+#prometheus-hook theme-set "$THEME_NAME"

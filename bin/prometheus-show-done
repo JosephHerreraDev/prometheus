@@ -1,7 +1,15 @@
-#!/bin/bash
+#!/usr/bin/env bash
 
-# Display a "Done!" message with a spinner and wait for user to press any key.
-# Used by various install scripts to indicate completion.
+# Display a completion message and keep the presentation terminal open.
 
-echo
-gum spin --spinner "globe" --title "Done! Press any key to close..." -- bash -c 'read -n 1 -s'
+set -euo pipefail
+
+message="${1:-Done!}"
+prompt="${PROMETHEUS_DONE_PROMPT:-Press any key to close...}"
+
+printf '\n\033[32m%s\033[0m\n' "$message"
+
+if [[ -t 0 ]]; then
+  printf '\n%s' "$prompt"
+  IFS= read -r -n 1 -s
+fi

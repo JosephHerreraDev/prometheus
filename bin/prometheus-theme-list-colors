@@ -1,0 +1,50 @@
+#!/bin/bash
+
+USER_THEMES_PATH="$HOME/.config/prometheus/themes"
+PROMETHEUS_ROOT="${PROMETHEUS_PATH:-$(cd "$(dirname "${BASH_SOURCE[0]}")/.." && pwd)}"
+PROMETHEUS_THEMES_PATH="$PROMETHEUS_ROOT/themes"
+
+display_name() {
+  echo "$1" | sed -E 's/(^|-)([a-z])/\1\u\2/g; s/-/ /g'
+}
+
+color_value() {
+  local file="$1"
+  local key="$2"
+
+  sed -nE "s/^${key}[[:space:]]*=[[:space:]]*\"(#[0-9A-Fa-f]{6})\".*/\1/p" "$file" | head -n 1
+}
+
+theme_color_file() {
+  local name="$1"
+
+  if [[ -f "$USER_THEMES_PATH/$name/colors.toml" ]]; then
+    echo "$USER_THEMES_PATH/$name/colors.toml"
+  elif [[ -f "$PROMETHEUS_THEMES_PATH/$name/colors.toml" ]]; then
+    echo "$PROMETHEUS_THEMES_PATH/$name/colors.toml"
+  fi
+}
+
+{
+  if [[ -d "$USER_THEMES_PATH" ]]; then
+    find "$USER_THEMES_PATH" -mindepth 1 -maxdepth 1 \( -type d -o -type l \) -printf '%f\n'
+  fi
+
+  if [[ -d "$PROMETHEUS_THEMES_PATH" ]]; then
+    find "$PROMETHEUS_THEMES_PATH" -mindepth 1 -maxdepth 1 -type d -printf '%f\n'
+  fi
+} | sort -u | while read -r name; do
+  colors_file="$(theme_color_file "$name")"
+  colors=()
+
+  if [[ -n "$colors_file" ]]; then
+    for key in background accent color1 color2 color4 foreground; do
+      color="$(color_value "$colors_file" "$key")"
+      if [[ -n "$color" ]]; then
+        colors+=("$color")
+      fi
+    done
+  fi
+
+  printf '%s\t%s\n' "$(display_name "$name")" "$(IFS=,; echo "${colors[*]}")"
+done
