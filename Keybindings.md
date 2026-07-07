@@ -30,9 +30,7 @@
 | `SUPER + T`           | Theme selector                   |
 | `SUPER + W`           | Wallpaper selector               |
 | `SUPER + ALT + W`     | Current theme wallpaper selector |
-| `PRINT`               | Screenshot workspace             |
-| `SHIFT + PRINT`       | Screenshot region                |
-| `SUPER + PRINT`       | Screenshot window                |
+| `PRINT`               | Screenshot menu                  |
 | `SUPER + SHIFT + V`   | Clipboard history                |
 | `SUPER + SHIFT + L`   | Lock session                     |
 
