@@ -1,0 +1,25 @@
+#!/bin/bash
+set -euo pipefail
+
+QUICKSHELL_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")/.." && pwd -P)"
+PROMETHEUS_ROOT="$(cd "$QUICKSHELL_DIR/../../../.." && pwd)"
+
+export PROMETHEUS_PATH="$PROMETHEUS_ROOT"
+export PATH="$PROMETHEUS_ROOT/bin:$PATH"
+
+case "${1:-}" in
+  current)
+    exec prometheus-theme-current
+    ;;
+  list)
+    exec prometheus-theme-list-colors
+    ;;
+  set)
+    shift
+    exec prometheus-theme-set "$@"
+    ;;
+  *)
+    echo "Usage: themectl {current|list|set <theme-name>}" >&2
+    exit 2
+    ;;
+esac

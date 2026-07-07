@@ -45,6 +45,7 @@ Pill {
       "obsidian": "pencil.svg",
       "kitty": "terminal.svg",
       "org.pwmt.zathura": "book.svg",
+      "steam": "game.svg",
     }
 
     if (customIcons[cls]) {

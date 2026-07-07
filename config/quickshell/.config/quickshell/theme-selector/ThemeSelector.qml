@@ -24,6 +24,7 @@ Scope {
 
   readonly property int animationDuration: 140
   readonly property int maxVisibleResults: 12
+  readonly property string helper: Quickshell.shellPath("theme-selector/themectl")
 
   function screenFocused(screen) {
     const monitor = Hyprland.monitorFor(screen)
@@ -69,8 +70,8 @@ Scope {
 
   function refresh(): void {
     statusText = "Loading themes..."
-    currentProcess.exec(["prometheus-theme-current"])
-    listProcess.exec(["prometheus-theme-list-colors"])
+    currentProcess.exec([helper, "current"])
+    listProcess.exec([helper, "list"])
   }
 
   function filter(): void {
@@ -127,7 +128,7 @@ Scope {
     }
 
     close()
-    Quickshell.execDetached(["prometheus-theme-set", item.name])
+    Quickshell.execDetached([helper, "set", item.name])
   }
 
   onQueryChanged: filter()
