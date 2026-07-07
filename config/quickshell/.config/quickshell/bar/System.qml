@@ -58,11 +58,11 @@ Pill {
       model: [
         {
           icon: "../icons/bluetooth.svg",
-          command: "kitty bluetui"
+          command: "prometheus-launch-or-focus-tui bluetui"
         },
         {
           icon: "../icons/wifi.svg",
-          command: "kitty impala"
+          command: "prometheus-launch-or-focus-tui impala"
         },
         {
           icon: "../icons/brightness.svg",
@@ -72,7 +72,7 @@ Pill {
         },
         {
           icon: "../icons/volume.svg",
-          command: "kitty wiremix",
+          command: "prometheus-launch-or-focus-tui wiremix",
           scrollUp: "wpctl set-volume -l 1.0 @DEFAULT_AUDIO_SINK@ 2%+",
           scrollDown: "wpctl set-volume @DEFAULT_AUDIO_SINK@ 2%-",
           middleClick: "wpctl set-mute @DEFAULT_AUDIO_SINK@ toggle",
@@ -85,11 +85,11 @@ Pill {
         },
         {
           icon: "../icons/cpu.svg",
-          command: "kitty btop"
+          command: "prometheus-launch-or-focus-tui btop"
         },
         {
           icon: "../icons/arch.svg",
-          command: "kitty --hold fastfetch"
+          command: "prometheus-launch-or-focus-tui --hold fastfetch"
         }
       ]
 
