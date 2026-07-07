@@ -38,6 +38,7 @@ echo "$THEME_NAME" > "$HOME/.config/prometheus/current/theme.name"
 prometheus-theme-bg-next
 prometheus-restart-terminal
 prometheus-restart-btop
+prometheus-theme-set-obsidian
 prometheus-restart-quickshell
 prometheus-restart-hyprctl
 #prometheus-hook theme-set "$THEME_NAME"
