@@ -271,10 +271,19 @@ Scope {
       Rectangle {
         id: panel
 
+        readonly property int contentMargin: 14
+        readonly property int titleHeight: 20
+        readonly property int gridCellHeight: 132
+        readonly property int gridColumnCount: Math.max(1, Math.floor((width - contentMargin * 2) / 190))
+        readonly property int gridRowCount: root.statusText.length === 0
+          ? Math.max(1, Math.ceil(root.wallpapers.length / gridColumnCount))
+          : 1
+        readonly property int desiredHeight: contentMargin * 2 + titleHeight + 12 + gridRowCount * gridCellHeight
+
         opacity: root.opened ? 1.0 : 0.0
         scale: root.opened ? 1.0 : 0.96
         width: Math.min(780, window.width - 40)
-        height: Math.min(600, window.height - 80)
+        height: Math.min(600, window.height - 80, desiredHeight)
         anchors.centerIn: parent
 
         radius: 8
@@ -329,7 +338,7 @@ Scope {
           GridView {
             id: grid
 
-            property int columnCount: Math.max(1, Math.floor(width / 190))
+            property int columnCount: panel.gridColumnCount
 
             visible: root.statusText.length === 0
             Layout.fillWidth: true
