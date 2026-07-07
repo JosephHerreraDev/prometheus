@@ -23,6 +23,7 @@ hl.bind(mainMod .. "+ ALT + Space", hl.dsp.exec_cmd("qs ipc call launcher toggle
 hl.bind(mainMod .. " + T", hl.dsp.exec_cmd("qs ipc call theme toggle"))
 hl.bind(mainMod .. " + W", hl.dsp.exec_cmd("qs ipc call wallpaper toggle"))
 hl.bind(mainMod .. " + SHIFT + W", hl.dsp.exec_cmd("qs ipc call themewallpaper toggle"))
+hl.bind("Print", hl.dsp.exec_cmd("qs ipc call screenshot-menu toggle"))
 hl.bind(mainMod .. " + P", hl.dsp.window.pseudo())
 hl.bind(mainMod .. " + J", hl.dsp.layout("togglesplit"))    -- dwindle only
 
