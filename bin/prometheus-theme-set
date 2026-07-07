@@ -39,4 +39,5 @@ prometheus-theme-bg-next
 prometheus-restart-terminal
 prometheus-restart-btop
 prometheus-restart-quickshell
+prometheus-restart-hyprctl
 #prometheus-hook theme-set "$THEME_NAME"
