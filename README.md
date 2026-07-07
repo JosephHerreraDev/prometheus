@@ -1,6 +1,6 @@
 # Prometheus
 
-A modern arch rice.
+A modern, fast, customizable and minimal arch rice.
 
 <img width="1080" height="607" alt="hyprland-beatiful-minimalist-rice-for-productivity-v0-7p2dbxa4euvg1" src="https://github.com/user-attachments/assets/22cf90f4-6319-40ab-83d3-d0473d70f90d" />
 
@@ -16,15 +16,12 @@ curl -sSL https://raw.githubusercontent.com/JosephHerreraDev/prometheus/main/boo
 ```
 
 > [!WARNING]
-> This is only for a fresh arch linux install, with the selection of hyprland from archinstall
+> This is only for a fresh arch linux install.
 
 ## Features
 
-- Hyprland window manager
-- Theme switching
-- Total personalization
-- Quickshell based
+- Hyprland window manager with custom settings
+- Theme switching from predefined selections, with the ability to add custom ones
+- Wallpapers, from the current theme or in general
+- Quickshell based: all menus, bar, notification manager.
 
-## Analytics
-
-![Alt](https://repobeats.axiom.co/api/embed/89b4da8d5979097d5ac1f51c474ab093c2918532.svg "Repobeats analytics image")
