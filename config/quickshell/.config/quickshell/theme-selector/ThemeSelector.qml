@@ -23,7 +23,7 @@ Scope {
   property int selectedIndex: -1
 
   readonly property int animationDuration: 140
-  readonly property int maxVisibleResults: 12
+  readonly property int maxVisibleRows: 3
   readonly property string helper: Quickshell.shellPath("theme-selector/themectl")
 
   function screenFocused(screen) {
@@ -120,6 +120,25 @@ Scope {
     }
 
     return null
+  }
+
+  function currentThemeColors() {
+    for (let i = 0; i < themes.length; i++) {
+      if (themes[i].current) {
+        return themes[i].colors
+      }
+    }
+
+    return []
+  }
+
+  function moveSelection(delta) {
+    if (filteredThemes.length === 0) {
+      selectedIndex = -1
+      return
+    }
+
+    selectedIndex = Math.max(0, Math.min(selectedIndex + delta, filteredThemes.length - 1))
   }
 
   function applyTheme(item) {
@@ -297,13 +316,9 @@ Scope {
       Rectangle {
         opacity: root.opened ? 1.0 : 0.0
         scale: root.opened ? 1.0 : 0.96
-        width: Math.min(620, window.width - 40)
-        implicitHeight: content.implicitHeight + 28
-        anchors {
-          top: parent.top
-          topMargin: Math.max(88, Math.round(window.height * 0.18))
-          horizontalCenter: parent.horizontalCenter
-        }
+        width: Math.min(700, window.width - 32)
+        height: Math.min(window.height - 48, content.implicitHeight + 32)
+        anchors.centerIn: parent
 
         radius: 8
         color: root.theme.color0
@@ -340,20 +355,77 @@ Scope {
             margins: 14
           }
 
-          spacing: 10
+          spacing: 12
+
+          ColumnLayout {
+            Layout.fillWidth: true
+            spacing: 5
+
+            Text {
+              text: "Themes"
+              color: root.theme.color6
+              font.pixelSize: 18
+              font.weight: Font.DemiBold
+            }
+
+            RowLayout {
+              Layout.fillWidth: true
+              spacing: 8
+
+              Text {
+                text: "Current theme"
+                color: root.theme.color4
+                font.pixelSize: 12
+                Layout.alignment: Qt.AlignVCenter
+              }
+
+              Text {
+                Layout.fillWidth: true
+                Layout.alignment: Qt.AlignVCenter
+                text: root.currentTheme
+                color: root.theme.color6
+                font.pixelSize: 13
+                font.weight: Font.DemiBold
+                elide: Text.ElideRight
+              }
+
+              RowLayout {
+                Layout.alignment: Qt.AlignVCenter
+                spacing: 4
+
+                Repeater {
+                  model: root.currentThemeColors().slice(0, 4)
+
+                  Rectangle {
+                    required property var modelData
+
+                    Layout.preferredWidth: 12
+                    Layout.preferredHeight: 12
+                    radius: 3
+                    color: modelData
+                    border.width: 1
+                    border.color: root.theme.color0
+                  }
+                }
+              }
+            }
+          }
 
           TextField {
             id: input
 
             Layout.fillWidth: true
+            Layout.preferredHeight: 42
             text: root.query
-            placeholderText: "Select theme"
+            placeholderText: "Search themes"
             selectByMouse: true
             color: root.theme.color6
             placeholderTextColor: root.theme.color4
-            font.pixelSize: 18
+            font.pixelSize: 15
+            leftPadding: 12
+            rightPadding: 12
             background: Rectangle {
-              radius: 8
+              radius: 6
               color: root.theme.color1
               border.width: 1
               border.color: input.activeFocus ? root.theme.color8 : root.theme.color3
@@ -363,13 +435,21 @@ Scope {
             onAccepted: root.applyTheme(root.selectedTheme())
 
             Keys.onPressed: function(event) {
-              if (event.key === Qt.Key_Down && root.filteredThemes.length > 0) {
-                root.selectedIndex = Math.min(root.selectedIndex + 1, root.filteredThemes.length - 1)
-                resultsList.positionViewAtIndex(root.selectedIndex, ListView.Contain)
+              if (event.key === Qt.Key_Right && root.filteredThemes.length > 0) {
+                root.moveSelection(1)
+                resultsGrid.positionViewAtIndex(root.selectedIndex, GridView.Contain)
+                event.accepted = true
+              } else if (event.key === Qt.Key_Left && root.filteredThemes.length > 0) {
+                root.moveSelection(-1)
+                resultsGrid.positionViewAtIndex(root.selectedIndex, GridView.Contain)
+                event.accepted = true
+              } else if (event.key === Qt.Key_Down && root.filteredThemes.length > 0) {
+                root.moveSelection(resultsGrid.columns)
+                resultsGrid.positionViewAtIndex(root.selectedIndex, GridView.Contain)
                 event.accepted = true
               } else if (event.key === Qt.Key_Up && root.filteredThemes.length > 0) {
-                root.selectedIndex = Math.max(root.selectedIndex - 1, 0)
-                resultsList.positionViewAtIndex(root.selectedIndex, ListView.Contain)
+                root.moveSelection(-resultsGrid.columns)
+                resultsGrid.positionViewAtIndex(root.selectedIndex, GridView.Contain)
                 event.accepted = true
               } else if (event.key === Qt.Key_Escape) {
                 root.close()
@@ -381,123 +461,119 @@ Scope {
           Text {
             visible: root.statusText.length > 0 || root.filteredThemes.length === 0
             Layout.fillWidth: true
-            text: root.statusText.length > 0 ? root.statusText : "No matches"
+            Layout.preferredHeight: 48
+            text: root.statusText.length > 0 ? root.statusText : "No matching themes"
             color: root.theme.color4
             font.pixelSize: 13
             horizontalAlignment: Text.AlignHCenter
+            verticalAlignment: Text.AlignVCenter
           }
 
-          ListView {
-            id: resultsList
+          GridView {
+            id: resultsGrid
 
             visible: root.statusText.length === 0 && root.filteredThemes.length > 0
             Layout.fillWidth: true
-            Layout.preferredHeight: Math.min(root.filteredThemes.length, root.maxVisibleResults) * 48
+            Layout.preferredHeight: Math.min(Math.ceil(root.filteredThemes.length / columns), root.maxVisibleRows) * cellHeight
             clip: true
-            interactive: root.filteredThemes.length > root.maxVisibleResults
+            interactive: Math.ceil(root.filteredThemes.length / columns) > root.maxVisibleRows
             currentIndex: root.selectedIndex
             model: root.filteredThemes
             boundsBehavior: Flickable.StopAtBounds
+            readonly property int columns: width >= 520 ? 2 : 1
+            cellWidth: width / columns
+            cellHeight: 100
 
             onCurrentIndexChanged: {
               if (currentIndex >= 0) {
-                positionViewAtIndex(currentIndex, ListView.Contain)
+                positionViewAtIndex(currentIndex, GridView.Contain)
               }
             }
 
             ScrollBar.vertical: ScrollBar {
-              policy: root.filteredThemes.length > root.maxVisibleResults
+              policy: Math.ceil(root.filteredThemes.length / resultsGrid.columns) > root.maxVisibleRows
                 ? ScrollBar.AsNeeded
                 : ScrollBar.AlwaysOff
             }
 
             delegate: Rectangle {
-              id: row
+              id: themeCard
 
               required property int index
               required property var modelData
 
-              width: resultsList.width
-              height: 48
-              radius: 8
-              color: ListView.isCurrentItem || rowMouse.containsMouse
-                ? root.theme.color2
-                : "transparent"
-              border.width: ListView.isCurrentItem ? 1 : 0
-              border.color: root.theme.color8
+              width: resultsGrid.cellWidth - 8
+              height: resultsGrid.cellHeight - 8
+              radius: 6
+              color: GridView.isCurrentItem || cardMouse.containsMouse
+                ? root.theme.color1
+                : root.theme.color0
+              border.width: GridView.isCurrentItem || cardMouse.containsMouse ? 1 : 0
+              border.color: GridView.isCurrentItem ? root.theme.color8 : root.theme.color3
 
-              RowLayout {
+              ColumnLayout {
                 anchors {
                   left: parent.left
                   right: parent.right
                   top: parent.top
                   bottom: parent.bottom
-                  leftMargin: 12
-                  rightMargin: 12
+                  margins: 12
                 }
 
-                spacing: 10
-
-                Rectangle {
-                  Layout.preferredWidth: 14
-                  Layout.preferredHeight: 14
-                  Layout.alignment: Qt.AlignVCenter
-                  radius: 7
-                  color: row.modelData.current ? root.theme.color8 : root.theme.color3
-                  border.width: 1
-                  border.color: row.modelData.current ? root.theme.color6 : root.theme.color4
-                }
+                spacing: 6
 
                 Text {
                   Layout.fillWidth: true
-                  Layout.alignment: Qt.AlignVCenter
-                  text: row.modelData.name
-                  color: row.modelData.current || ListView.isCurrentItem ? root.theme.color6 : root.theme.color4
-                  font.pixelSize: 14
-                  font.weight: row.modelData.current ? Font.DemiBold : Font.Normal
+                  text: themeCard.modelData.name
+                  color: themeCard.modelData.current || GridView.isCurrentItem ? root.theme.color6 : root.theme.color4
+                  font.pixelSize: 15
+                  font.weight: themeCard.modelData.current ? Font.DemiBold : Font.Medium
                   elide: Text.ElideRight
                 }
 
                 RowLayout {
-                  Layout.alignment: Qt.AlignVCenter
-                  spacing: -3
+                  Layout.fillWidth: true
+                  spacing: 5
 
                   Repeater {
-                    model: row.modelData.colors
+                    model: themeCard.modelData.colors
 
                     Rectangle {
                       required property var modelData
 
-                      Layout.preferredWidth: 12
-                      Layout.preferredHeight: 12
-                      radius: 6
+                      Layout.preferredWidth: 18
+                      Layout.preferredHeight: 18
+                      radius: 4
                       color: modelData
                       border.width: 1
-                      border.color: root.theme.color3
+                      border.color: root.theme.color0
                     }
                   }
-                }
 
-                Text {
-                  visible: row.modelData.current
-                  Layout.alignment: Qt.AlignVCenter
-                  text: "Current"
-                  color: root.theme.color8
-                  font.pixelSize: 11
-                  font.weight: Font.DemiBold
+                  Item {
+                    Layout.fillWidth: true
+                  }
+
+                  Text {
+                    visible: themeCard.modelData.current
+                    text: "Current"
+                    color: root.theme.color8
+                    font.pixelSize: 11
+                    font.weight: Font.DemiBold
+                  }
                 }
               }
 
               MouseArea {
-                id: rowMouse
+                id: cardMouse
 
                 anchors.fill: parent
                 hoverEnabled: true
                 cursorShape: Qt.PointingHandCursor
                 onEntered: {
-                  root.selectedIndex = row.index
+                  root.selectedIndex = themeCard.index
                 }
-                onClicked: root.applyTheme(row.modelData)
+                onClicked: root.applyTheme(themeCard.modelData)
               }
             }
           }

@@ -1,0 +1,201 @@
+#!/bin/bash
+
+set -euo pipefail
+
+require() {
+  local command="$1"
+
+  if ! command -v "$command" >/dev/null 2>&1; then
+    echo "$command is not installed" >&2
+    exit 127
+  fi
+}
+
+db_path() {
+  cliphist version 2>&1 | awk '$1 == "db-path" { print $2; exit }'
+}
+
+state_dir() {
+  printf '%s\n' "${XDG_CACHE_HOME:-$HOME/.cache}/prometheus"
+}
+
+pins_path() {
+  printf '%s\n' "$(state_dir)/clipboard-pins"
+}
+
+ensure_state_dir() {
+  mkdir -p "$(state_dir)"
+}
+
+repair_broken_db() {
+  local db backup
+
+  db="$(db_path)"
+  [[ -n $db && -f $db ]] || return 0
+
+  backup="${db}.broken.$(date +%Y%m%d%H%M%S)"
+  mv "$db" "$backup" 2>/dev/null || rm -f "$db" 2>/dev/null || true
+}
+
+entry_for_id() {
+  local id="$1"
+  local line entry_id
+
+  while IFS= read -r line; do
+    entry_id="${line%%$'\t'*}"
+
+    if [[ $entry_id == "$id" ]]; then
+      printf '%s' "$line"
+      return 0
+    fi
+  done < <(cliphist list)
+}
+
+is_pinned() {
+  local id="$1"
+  local pins
+
+  pins="$(pins_path)"
+  [[ -f $pins ]] && grep -Fxq -- "$id" "$pins"
+}
+
+pin_entry() {
+  local id="${1:-}"
+
+  [[ -n $id ]] || exit 2
+  ensure_state_dir
+
+  if ! is_pinned "$id"; then
+    printf '%s\n' "$id" >> "$(pins_path)"
+  fi
+}
+
+unpin_entry() {
+  local id="${1:-}"
+  local pins tmp
+
+  [[ -n $id ]] || exit 2
+  pins="$(pins_path)"
+  [[ -f $pins ]] || return 0
+
+  tmp="${pins}.$$"
+  grep -Fxv -- "$id" "$pins" > "$tmp" || true
+  mv "$tmp" "$pins"
+}
+
+toggle_pin() {
+  local id="${1:-}"
+
+  [[ -n $id ]] || exit 2
+
+  if is_pinned "$id"; then
+    unpin_entry "$id"
+  else
+    pin_entry "$id"
+  fi
+}
+
+print_entries() {
+  local output="$1"
+  local pinned=()
+  local normal=()
+  local line entry_id is_pin
+
+  while IFS= read -r line; do
+    [[ -n $line ]] || continue
+
+    entry_id="${line%%$'\t'*}"
+    is_pin=0
+
+    if is_pinned "$entry_id"; then
+      is_pin=1
+      pinned+=("${entry_id}"$'\t'"${is_pin}"$'\t'"${line#*$'\t'}")
+    else
+      normal+=("${entry_id}"$'\t'"${is_pin}"$'\t'"${line#*$'\t'}")
+    fi
+  done <<< "$output"
+
+  printf '%s\n' "${pinned[@]}" "${normal[@]}" | sed '/^$/d'
+}
+
+list_entries() {
+  local output status
+
+  require cliphist
+
+  output="$(cliphist list 2>&1)" || status=$?
+  status="${status:-0}"
+
+  if [[ $status -eq 0 ]]; then
+    print_entries "$output"
+    return 0
+  fi
+
+  if grep -qi "please store something first" <<< "$output"; then
+    return 0
+  fi
+
+  if grep -qi "nil pointer dereference" <<< "$output"; then
+    repair_broken_db
+    return 0
+  fi
+
+  printf '%s\n' "$output" >&2
+  return "$status"
+}
+
+copy_entry() {
+  local id="${1:-}"
+
+  require cliphist
+  require wl-copy
+  [[ -n $id ]] || exit 2
+
+  cliphist decode "$id" | wl-copy --type text/plain
+}
+
+delete_entry() {
+  local id="${1:-}"
+  local entry
+
+  require cliphist
+  [[ -n $id ]] || exit 2
+
+  entry="$(entry_for_id "$id" || true)"
+  if [[ -n $entry ]]; then
+    printf '%s\n' "$entry" | cliphist delete
+  else
+    printf '%s\n' "$id" | cliphist delete
+  fi
+  unpin_entry "$id"
+}
+
+case "${1:-}" in
+  list)
+    list_entries
+    ;;
+  copy)
+    copy_entry "${2:-}"
+    ;;
+  delete)
+    delete_entry "${2:-}"
+    ;;
+  pin)
+    pin_entry "${2:-}"
+    ;;
+  unpin)
+    unpin_entry "${2:-}"
+    ;;
+  toggle-pin)
+    toggle_pin "${2:-}"
+    ;;
+  clear)
+    require cliphist
+    cliphist wipe
+    rm -f "$(pins_path)"
+    ;;
+  *)
+    echo "Usage: $0 {list|copy <id>|delete <id>|pin <id>|unpin <id>|toggle-pin <id>|clear}" >&2
+    exit 2
+    ;;
+esac

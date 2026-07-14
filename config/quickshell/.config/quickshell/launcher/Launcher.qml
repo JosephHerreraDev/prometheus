@@ -24,7 +24,7 @@ Scope {
   property int focusRequest: 0
 
   readonly property int animationDuration: 140
-  readonly property int maxVisibleResults: 12
+  readonly property int maxVisibleRows: 3
   readonly property string helper: Quickshell.shellPath("launcher/launcherctl")
 
   function screenFocused(screen) {
@@ -160,6 +160,15 @@ Scope {
     }
 
     return null
+  }
+
+  function moveSelection(delta) {
+    if (filteredApps.length === 0) {
+      selectedIndex = -1
+      return
+    }
+
+    selectedIndex = Math.max(0, Math.min(selectedIndex + delta, filteredApps.length - 1))
   }
 
   function launch(app) {
@@ -337,13 +346,9 @@ Scope {
 
         opacity: root.opened ? 1.0 : 0.0
         scale: root.opened ? 1.0 : 0.96
-        width: Math.min(680, window.width - 40)
-        implicitHeight: content.implicitHeight + 28
-        anchors {
-          top: parent.top
-          topMargin: Math.max(88, Math.round(window.height * 0.18))
-          horizontalCenter: parent.horizontalCenter
-        }
+        width: Math.min(700, window.width - 32)
+        implicitHeight: content.implicitHeight + 32
+        anchors.centerIn: parent
 
         radius: 8
         color: root.theme.color0
@@ -380,20 +385,42 @@ Scope {
             margins: 14
           }
 
-          spacing: 10
+          spacing: 12
+
+          RowLayout {
+            Layout.fillWidth: true
+
+            Text {
+              Layout.fillWidth: true
+              text: "Applications"
+              color: root.theme.color6
+              font.pixelSize: 18
+              font.weight: Font.DemiBold
+              elide: Text.ElideRight
+            }
+
+            Text {
+              text: root.appsLoaded ? root.apps.length + " available" : "Loading"
+              color: root.theme.color4
+              font.pixelSize: 12
+            }
+          }
 
           TextField {
             id: input
 
             Layout.fillWidth: true
+            Layout.preferredHeight: 42
             text: root.query
-            placeholderText: "Launch app"
+            placeholderText: "Search applications"
             selectByMouse: true
             color: root.theme.color6
             placeholderTextColor: root.theme.color4
-            font.pixelSize: 18
+            font.pixelSize: 15
+            leftPadding: 12
+            rightPadding: 12
             background: Rectangle {
-              radius: 8
+              radius: 6
               color: root.theme.color1
               border.width: 1
               border.color: input.activeFocus ? root.theme.color8 : root.theme.color3
@@ -403,13 +430,21 @@ Scope {
             onAccepted: root.launch(root.selectedApp())
 
             Keys.onPressed: function(event) {
-              if (event.key === Qt.Key_Down && root.filteredApps.length > 0) {
-                root.selectedIndex = Math.min(root.selectedIndex + 1, root.filteredApps.length - 1)
-                results.positionViewAtIndex(root.selectedIndex, ListView.Contain)
+              if (event.key === Qt.Key_Right && root.filteredApps.length > 0) {
+                root.moveSelection(1)
+                resultsGrid.positionViewAtIndex(root.selectedIndex, GridView.Contain)
+                event.accepted = true
+              } else if (event.key === Qt.Key_Left && root.filteredApps.length > 0) {
+                root.moveSelection(-1)
+                resultsGrid.positionViewAtIndex(root.selectedIndex, GridView.Contain)
+                event.accepted = true
+              } else if (event.key === Qt.Key_Down && root.filteredApps.length > 0) {
+                root.moveSelection(resultsGrid.columns)
+                resultsGrid.positionViewAtIndex(root.selectedIndex, GridView.Contain)
                 event.accepted = true
               } else if (event.key === Qt.Key_Up && root.filteredApps.length > 0) {
-                root.selectedIndex = Math.max(root.selectedIndex - 1, 0)
-                results.positionViewAtIndex(root.selectedIndex, ListView.Contain)
+                root.moveSelection(-resultsGrid.columns)
+                resultsGrid.positionViewAtIndex(root.selectedIndex, GridView.Contain)
                 event.accepted = true
               } else if (event.key === Qt.Key_Escape) {
                 root.close()
@@ -421,50 +456,55 @@ Scope {
           Text {
             visible: root.filteredApps.length === 0
             Layout.fillWidth: true
+            Layout.preferredHeight: 48
             text: !root.appsLoaded ? "Loading apps..." : root.apps.length === 0 ? "No apps found" : "No matches"
             color: root.theme.color4
             font.pixelSize: 13
             horizontalAlignment: Text.AlignHCenter
+            verticalAlignment: Text.AlignVCenter
           }
 
-          ListView {
-            id: results
+          GridView {
+            id: resultsGrid
 
             visible: root.filteredApps.length > 0
             Layout.fillWidth: true
-            Layout.preferredHeight: Math.min(root.filteredApps.length, root.maxVisibleResults) * 52
+            Layout.preferredHeight: Math.min(Math.ceil(root.filteredApps.length / columns), root.maxVisibleRows) * cellHeight
             clip: true
-            interactive: root.filteredApps.length > root.maxVisibleResults
+            interactive: Math.ceil(root.filteredApps.length / columns) > root.maxVisibleRows
             currentIndex: root.selectedIndex
             model: root.filteredApps
             boundsBehavior: Flickable.StopAtBounds
+            readonly property int columns: width >= 520 ? 2 : 1
+            cellWidth: width / columns
+            cellHeight: 92
 
             onCurrentIndexChanged: {
               if (currentIndex >= 0) {
-                positionViewAtIndex(currentIndex, ListView.Contain)
+                positionViewAtIndex(currentIndex, GridView.Contain)
               }
             }
 
             ScrollBar.vertical: ScrollBar {
-              policy: root.filteredApps.length > root.maxVisibleResults
+              policy: Math.ceil(root.filteredApps.length / resultsGrid.columns) > root.maxVisibleRows
                 ? ScrollBar.AsNeeded
                 : ScrollBar.AlwaysOff
             }
 
             delegate: Rectangle {
-              id: row
+              id: appCard
 
               required property int index
               required property var modelData
 
-              width: results.width
-              height: 52
-              radius: 8
-              color: ListView.isCurrentItem || rowMouse.containsMouse
-                ? root.theme.color2
-                : "transparent"
-              border.width: ListView.isCurrentItem ? 1 : 0
-              border.color: root.theme.color8
+              width: resultsGrid.cellWidth - 8
+              height: resultsGrid.cellHeight - 8
+              radius: 6
+              color: GridView.isCurrentItem || cardMouse.containsMouse
+                ? root.theme.color1
+                : root.theme.color0
+              border.width: GridView.isCurrentItem || cardMouse.containsMouse ? 1 : 0
+              border.color: GridView.isCurrentItem ? root.theme.color8 : root.theme.color3
 
               RowLayout {
                 anchors {
@@ -472,8 +512,7 @@ Scope {
                   right: parent.right
                   top: parent.top
                   bottom: parent.bottom
-                  leftMargin: 12
-                  rightMargin: 12
+                  margins: 12
                 }
 
                 spacing: 10
@@ -481,18 +520,18 @@ Scope {
                 IconImage {
                   id: appIcon
 
-                  Layout.preferredWidth: 28
-                  Layout.preferredHeight: 28
+                  Layout.preferredWidth: 32
+                  Layout.preferredHeight: 32
                   Layout.alignment: Qt.AlignVCenter
-                  source: root.iconSource(row.modelData.icon)
+                  source: root.iconSource(appCard.modelData.icon)
                   asynchronous: true
                   mipmap: true
                   visible: status === Image.Ready
                 }
 
                 Rectangle {
-                  Layout.preferredWidth: 28
-                  Layout.preferredHeight: 28
+                  Layout.preferredWidth: 32
+                  Layout.preferredHeight: 32
                   Layout.alignment: Qt.AlignVCenter
                   visible: !appIcon.visible
                   radius: 6
@@ -502,7 +541,7 @@ Scope {
 
                   Text {
                     anchors.centerIn: parent
-                    text: row.modelData.name.length > 0 ? row.modelData.name[0].toUpperCase() : "?"
+                    text: appCard.modelData.name.length > 0 ? appCard.modelData.name[0].toUpperCase() : "?"
                     color: root.theme.color6
                     font.pixelSize: 13
                     font.weight: Font.DemiBold
@@ -516,16 +555,17 @@ Scope {
 
                   Text {
                     Layout.fillWidth: true
-                    text: row.modelData.name
-                    color: ListView.isCurrentItem ? root.theme.color6 : root.theme.color4
-                    font.pixelSize: 14
+                    text: appCard.modelData.name
+                    color: GridView.isCurrentItem ? root.theme.color6 : root.theme.color4
+                    font.pixelSize: 15
+                    font.weight: GridView.isCurrentItem ? Font.DemiBold : Font.Medium
                     elide: Text.ElideRight
                   }
 
                   Text {
                     Layout.fillWidth: true
-                    visible: row.modelData.comment.length > 0 || row.modelData.genericName.length > 0
-                    text: row.modelData.comment.length > 0 ? row.modelData.comment : row.modelData.genericName
+                    visible: appCard.modelData.comment.length > 0 || appCard.modelData.genericName.length > 0
+                    text: appCard.modelData.comment.length > 0 ? appCard.modelData.comment : appCard.modelData.genericName
                     color: root.theme.color4
                     font.pixelSize: 11
                     elide: Text.ElideRight
@@ -534,15 +574,15 @@ Scope {
               }
 
               MouseArea {
-                id: rowMouse
+                id: cardMouse
 
                 anchors.fill: parent
                 hoverEnabled: true
                 cursorShape: Qt.PointingHandCursor
                 onEntered: {
-                  root.selectedIndex = row.index
+                  root.selectedIndex = appCard.index
                 }
-                onClicked: root.launch(row.modelData)
+                onClicked: root.launch(appCard.modelData)
               }
             }
           }

@@ -3,6 +3,10 @@ import QtQuick
 import QtQuick.Layouts
 
 Scope {
+  id: root
+
+  property QtObject systemState
+
   Variants {
     model: Quickshell.screens
 
@@ -59,6 +63,8 @@ Scope {
 
         System {
           id: system
+
+          systemState: root.systemState
 
           anchors {
             right: parent.right

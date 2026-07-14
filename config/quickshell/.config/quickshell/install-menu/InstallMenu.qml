@@ -2,9 +2,7 @@ import Quickshell
 import Quickshell.Hyprland
 import Quickshell.Io
 import Quickshell.Wayland
-import Quickshell.Widgets
 import QtQuick
-import QtQuick.Effects
 import QtQuick.Layouts
 import "../theme"
 
@@ -15,24 +13,19 @@ Scope {
   property QtObject theme: Theme {}
   property bool opened: false
   property bool mounted: false
-  property string pendingMode: ""
   property int selectedIndex: 0
   property int focusRequest: 0
+  property string pendingCommand: ""
   property var actions: [
     {
-      label: "Region",
-      icon: "../icons/region.svg",
-      mode: "region"
+      label: "Package",
+      detail: "Install from repositories",
+      command: "package"
     },
     {
-      label: "Window",
-      icon: "../icons/window.svg",
-      mode: "window"
-    },
-    {
-      label: "Screen",
-      icon: "../icons/screen.svg",
-      mode: "output"
+      label: "AUR",
+      detail: "Install from AUR",
+      command: "aur"
     }
   ]
 
@@ -49,10 +42,10 @@ Scope {
     hideTimer.stop()
     mounted = true
     opened = false
-    menuState.active = "screenshot-menu"
+    menuState.active = "install-menu"
     selectedIndex = 0
     Qt.callLater(function() {
-      if (menuState.active === "screenshot-menu") {
+      if (menuState.active === "install-menu") {
         opened = true
         requestFocus()
       }
@@ -62,7 +55,7 @@ Scope {
   function close(): void {
     opened = false
     hideTimer.restart()
-    if (menuState.active === "screenshot-menu") {
+    if (menuState.active === "install-menu") {
       menuState.active = ""
     }
   }
@@ -83,24 +76,24 @@ Scope {
     selectedIndex = Math.max(0, Math.min(selectedIndex + delta, actions.length - 1))
   }
 
-  function capture(mode) {
-    if (!mode || mode.length === 0) {
+  function run(command) {
+    if (!command || command.length === 0) {
       return
     }
 
-    pendingMode = mode
+    pendingCommand = command
     close()
-    captureTimer.restart()
+    launchTimer.restart()
   }
 
-  function captureSelected(): void {
+  function runSelected(): void {
     if (selectedIndex >= 0 && selectedIndex < actions.length) {
-      capture(actions[selectedIndex].mode)
+      run(actions[selectedIndex].command)
     }
   }
 
   IpcHandler {
-    target: "screenshot-menu"
+    target: "install-menu"
 
     function open(): void { root.open() }
     function close(): void { root.close() }
@@ -111,11 +104,11 @@ Scope {
     target: menuState
 
     function onActiveChanged(): void {
-      if (menuState.active === "screenshot-menu") {
+      if (menuState.active === "install-menu") {
         hideTimer.stop()
         root.mounted = true
         Qt.callLater(function() {
-          if (menuState.active === "screenshot-menu") {
+          if (menuState.active === "install-menu") {
             root.opened = true
             root.requestFocus()
           }
@@ -140,14 +133,14 @@ Scope {
   }
 
   Timer {
-    id: captureTimer
+    id: launchTimer
 
     interval: root.animationDuration + 40
     repeat: false
     onTriggered: {
-      if (root.pendingMode.length > 0) {
-        Quickshell.execDetached(["hyprshot", "-m", root.pendingMode])
-        root.pendingMode = ""
+      if (root.pendingCommand.length > 0) {
+        Quickshell.execDetached(["bash", "-lc", "exec \"$HOME/.local/share/prometheus/bin/prometheus-install-menu\" " + root.pendingCommand])
+        root.pendingCommand = ""
       }
     }
   }
@@ -169,7 +162,7 @@ Scope {
 
       WlrLayershell.layer: WlrLayer.Overlay
       WlrLayershell.keyboardFocus: WlrKeyboardFocus.Exclusive
-      WlrLayershell.namespace: "prometheus-screenshot-menu"
+      WlrLayershell.namespace: "prometheus-install-menu"
 
       anchors {
         top: true
@@ -201,8 +194,6 @@ Scope {
       }
 
       Rectangle {
-        id: scrim
-
         anchors.fill: parent
         color: "#66000000"
         opacity: root.opened ? 1.0 : 0.0
@@ -226,14 +217,9 @@ Scope {
 
         opacity: root.opened ? 1.0 : 0.0
         scale: root.opened ? 1.0 : 0.96
-        width: Math.min(440, window.width - 32)
-        height: content.implicitHeight + 32
-
-        anchors {
-          top: parent.top
-          horizontalCenter: parent.horizontalCenter
-          topMargin: 44
-        }
+        width: Math.min(420, window.width - 40)
+        implicitHeight: content.implicitHeight + 32
+        anchors.centerIn: parent
 
         radius: 8
         color: root.theme.color0
@@ -249,7 +235,7 @@ Scope {
             root.moveSelection(-1)
             event.accepted = true
           } else if (event.key === Qt.Key_Return || event.key === Qt.Key_Enter) {
-            root.captureSelected()
+            root.runSelected()
             event.accepted = true
           } else if (event.key === Qt.Key_Escape) {
             root.close()
@@ -287,21 +273,22 @@ Scope {
             margins: 16
           }
 
-          spacing: 8
+          spacing: 14
 
           Text {
             Layout.fillWidth: true
-            text: "Screenshot"
+            text: "Install"
             color: root.theme.color6
             font.pixelSize: 16
             font.weight: Font.DemiBold
+            horizontalAlignment: Text.AlignHCenter
           }
 
           GridLayout {
             Layout.fillWidth: true
-            columns: panel.width >= 400 ? 3 : 1
-            columnSpacing: 8
-            rowSpacing: 8
+            columns: window.width < 460 ? 1 : 2
+            columnSpacing: 10
+            rowSpacing: 10
 
             Repeater {
               model: root.actions
@@ -313,12 +300,10 @@ Scope {
                 required property var modelData
 
                 Layout.fillWidth: true
-                Layout.preferredHeight: 72
+                Layout.preferredHeight: 74
 
-                radius: 6
-                color: actionButton.index === root.selectedIndex || actionMouse.containsMouse
-                  ? root.theme.color1
-                  : root.theme.color0
+                radius: 8
+                color: actionButton.index === root.selectedIndex || actionMouse.containsMouse ? root.theme.color1 : root.theme.color2
                 border.width: 1
                 border.color: actionButton.index === root.selectedIndex || actionMouse.containsMouse
                   ? root.theme.color8
@@ -326,40 +311,21 @@ Scope {
 
                 ColumnLayout {
                   anchors.centerIn: parent
-                  spacing: 5
-
-                  Item {
-                    Layout.preferredWidth: 24
-                    Layout.preferredHeight: 24
-                    Layout.alignment: Qt.AlignHCenter
-
-                    IconImage {
-                      id: rawIcon
-
-                      anchors.fill: parent
-                      source: Qt.resolvedUrl(actionButton.modelData.icon)
-                      opacity: 0.0
-                    }
-
-                    MultiEffect {
-                      anchors.fill: parent
-                      source: rawIcon
-                      colorization: 1.0
-                      colorizationColor: actionButton.index === root.selectedIndex
-                        ? root.theme.color8
-                        : root.theme.color4
-                      brightness: 1.0
-                    }
-                  }
+                  spacing: 4
 
                   Text {
                     Layout.alignment: Qt.AlignHCenter
                     text: actionButton.modelData.label
-                    color: actionButton.index === root.selectedIndex
-                      ? root.theme.color6
-                      : root.theme.color4
+                    color: root.theme.color6
                     font.pixelSize: 14
                     font.weight: Font.DemiBold
+                  }
+
+                  Text {
+                    Layout.alignment: Qt.AlignHCenter
+                    text: actionButton.modelData.detail
+                    color: root.theme.color4
+                    font.pixelSize: 11
                   }
                 }
 
@@ -370,7 +336,7 @@ Scope {
                   hoverEnabled: true
                   cursorShape: Qt.PointingHandCursor
                   onEntered: root.selectedIndex = actionButton.index
-                  onClicked: root.capture(actionButton.modelData.mode)
+                  onClicked: root.run(actionButton.modelData.command)
                 }
               }
             }

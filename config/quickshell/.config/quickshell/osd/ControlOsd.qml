@@ -1,6 +1,5 @@
 import Quickshell
 import Quickshell.Hyprland
-import Quickshell.Io
 import Quickshell.Services.Pipewire
 import Quickshell.Wayland
 import Quickshell.Widgets
@@ -22,6 +21,10 @@ Scope {
   property int previousBrightness: -1
   property bool brightnessInitialized: false
   property bool volumeInitialized: false
+  property bool startupComplete: false
+  property QtObject systemState
+
+  readonly property int brightnessValue: systemState ? systemState.brightness : -1
 
   readonly property int width: 320
   readonly property int height: 92
@@ -52,6 +55,10 @@ Scope {
   }
 
   function show(newKind, newValue, isMuted) {
+    if (!startupComplete) {
+      return
+    }
+
     kind = newKind
     label = newKind === "brightness" ? "Brightness" : "Volume"
     icon = newKind === "brightness" ? "../icons/brightness.svg" : "../icons/volume.svg"
@@ -59,21 +66,6 @@ Scope {
     muted = isMuted === true
     visible = true
     hideTimer.restart()
-  }
-
-  function parseBrightness(text) {
-    const parts = text.trim().split(",")
-
-    if (parts.length >= 5) {
-      const percent = parseInt(parts[4].replace("%", ""), 10)
-
-      if (!isNaN(percent)) {
-        return clampPercent(percent)
-      }
-    }
-
-    const match = text.match(/([0-9]+)%/)
-    return match ? clampPercent(parseInt(match[1], 10)) : -1
   }
 
   onAudioValueChanged: {
@@ -102,6 +94,23 @@ Scope {
     show("volume", audioValue, audioMuted)
   }
 
+  onBrightnessValueChanged: {
+    if (brightnessValue < 0) {
+      return
+    }
+
+    if (!brightnessInitialized) {
+      previousBrightness = brightnessValue
+      brightnessInitialized = true
+      return
+    }
+
+    if (brightnessValue !== previousBrightness) {
+      previousBrightness = brightnessValue
+      show("brightness", brightnessValue, false)
+    }
+  }
+
   Timer {
     id: hideTimer
 
@@ -111,38 +120,10 @@ Scope {
   }
 
   Timer {
-    interval: 450
+    interval: 1500
     running: true
-    repeat: true
-    triggeredOnStart: true
-    onTriggered: brightnessProcess.exec(["brightnessctl", "-m", "info"])
-  }
-
-  Process {
-    id: brightnessProcess
-
-    stdout: StdioCollector {
-      waitForEnd: true
-
-      onStreamFinished: {
-        const brightness = root.parseBrightness(text)
-
-        if (brightness < 0) {
-          return
-        }
-
-        if (!root.brightnessInitialized) {
-          root.previousBrightness = brightness
-          root.brightnessInitialized = true
-          return
-        }
-
-        if (brightness !== root.previousBrightness) {
-          root.previousBrightness = brightness
-          root.show("brightness", brightness, false)
-        }
-      }
-    }
+    repeat: false
+    onTriggered: root.startupComplete = true
   }
 
   Variants {
