@@ -1,0 +1,60 @@
+#!/bin/bash
+
+set -euo pipefail
+
+require() {
+  local command="$1"
+
+  if ! command -v "$command" >/dev/null 2>&1; then
+    echo "$command is not installed" >&2
+    exit 127
+  fi
+}
+
+stop_existing() {
+  pkill -f "prometheus-clipboard-watch run-text" 2>/dev/null || true
+  pkill -x -f "wl-paste --type text --watch cliphist store" 2>/dev/null || true
+}
+
+start_watchers() {
+  local self
+
+  self="$(readlink -f "$0")"
+  nohup "$self" run-text >/dev/null 2>&1 &
+}
+
+watch_text() {
+  while true; do
+    wl-paste --type text --watch cliphist store || true
+    sleep 1
+  done
+}
+
+show_status() {
+  pgrep -af "prometheus-clipboard-watch|wl-paste|cliphist store" \
+    | grep -E "prometheus-clipboard-watch run-text|wl-paste .*--watch.*cliphist store|cliphist store" \
+    || true
+}
+
+require cliphist
+require wl-paste
+
+case "${1:-start}" in
+  start|restart)
+    stop_existing
+    start_watchers
+    ;;
+  run-text)
+    watch_text
+    ;;
+  stop)
+    stop_existing
+    ;;
+  status)
+    show_status
+    ;;
+  *)
+    echo "Usage: $0 {start|restart|stop|status}" >&2
+    exit 2
+    ;;
+esac

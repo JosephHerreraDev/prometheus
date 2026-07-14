@@ -2,27 +2,49 @@
 
 # Show a fuzzy-finder TUI for picking new AUR packages to install.
 
+set -o pipefail
+
+if ! command -v fzf >/dev/null 2>&1; then
+  echo "fzf is not installed. Install it first with: sudo pacman -S fzf" >&2
+  exit 127
+fi
+
+if ! command -v paru >/dev/null 2>&1; then
+  echo "paru is not installed. Install paru, then try again." >&2
+  exit 127
+fi
+
+if ! command -v curl >/dev/null 2>&1; then
+  echo "curl is not installed. Install it first with: sudo pacman -S curl" >&2
+  exit 127
+fi
+
+if ! command -v gzip >/dev/null 2>&1; then
+  echo "gzip is not installed. Install it first with: sudo pacman -S gzip" >&2
+  exit 127
+fi
+
 fzf_args=(
   --multi
-  --preview 'yay -Siia {1}'
+  --preview 'paru -Si --aur {1}'
   --preview-label='alt-p: toggle description, alt-b/B: toggle PKGBUILD, alt-j/k: scroll, tab: multi-select'
   --preview-label-pos='bottom'
   --preview-window 'down:65%:wrap'
   --bind 'alt-p:toggle-preview'
   --bind 'alt-d:preview-half-page-down,alt-u:preview-half-page-up'
   --bind 'alt-k:preview-up,alt-j:preview-down'
-  --bind 'alt-b:change-preview:yay -Gpa {1} | tail -n +5'
-  --bind 'alt-B:change-preview:yay -Siia {1}'
+  --bind 'alt-b:change-preview:paru -Gp {1}'
+  --bind 'alt-B:change-preview:paru -Si --aur {1}'
   --color 'pointer:green,marker:green'
 )
 
-pkg_names=$(yay -Slqa | fzf "${fzf_args[@]}")
+available_packages="$(curl -fsSL https://aur.archlinux.org/packages.gz | gzip -dc)" || exit $?
+pkg_names=$(printf '%s\n' "$available_packages" | fzf "${fzf_args[@]}")
 
 if [[ -n $pkg_names ]]; then
-  # Add aur/ prefix to each package name and convert to space-separated for yay
   source prometheus-sudo-keepalive
 
-  echo "$pkg_names" | sed 's/^/aur\//' | tr '\n' ' ' | xargs yay -S --noconfirm
+  printf '%s\n' "$pkg_names" | xargs paru -S --aur --noconfirm
   sudo updatedb
   prometheus-show-done
 fi

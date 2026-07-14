@@ -1,0 +1,31 @@
+#!/bin/bash
+
+set -euo pipefail
+
+export PATH="$HOME/.local/share/prometheus/bin:$PATH"
+
+case "${1:-}" in
+  package)
+    title="Install Packages"
+    command="prometheus-pkg-install"
+    ;;
+  aur)
+    title="Install AUR Packages"
+    command="prometheus-pkg-aur-install"
+    ;;
+  *)
+    echo "Usage: $0 {package|aur}" >&2
+    exit 2
+    ;;
+esac
+
+script="export PATH=\"\$HOME/.local/share/prometheus/bin:\$PATH\"; $command; status=\$?; echo; echo \"$title finished with status \$status.\"; echo \"Press Enter to close.\"; read -r _"
+
+if command -v xdg-terminal-exec >/dev/null 2>&1; then
+  exec setsid uwsm-app -- xdg-terminal-exec --app-id=org.prometheus.terminal -e bash -lc "$script"
+elif command -v kitty >/dev/null 2>&1; then
+  exec setsid uwsm-app -- kitty --hold --app-id=org.prometheus.terminal --title="$title" -e bash -lc "$script"
+else
+  notify-send -u critical "No supported terminal found" "Install xdg-terminal-exec or kitty."
+  exit 1
+fi

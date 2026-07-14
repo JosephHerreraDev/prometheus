@@ -2,6 +2,11 @@
 
 # Show a fuzzy-finder TUI for picking new Arch and OPR packages to install.
 
+if ! command -v fzf >/dev/null 2>&1; then
+  echo "fzf is not installed. Install it first with: sudo pacman -S fzf" >&2
+  exit 127
+fi
+
 fzf_args=(
   --multi
   --preview 'pacman -Sii {1}'
