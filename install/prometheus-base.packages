@@ -7,7 +7,7 @@ zathura
 zathura-pdf-mupdf
 cava
 hyprlock
-cliphist 
+cliphist
 wl-clipboard
 
 alsa-utils
@@ -60,7 +60,7 @@ mpv
 noto-fonts
 noto-fonts-cjk
 noto-fonts-emoji
-nvim
+neovim
 obs-studio
 obsidian
 pamixer

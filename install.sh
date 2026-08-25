@@ -12,4 +12,3 @@ export PATH="$PROMETHEUS_PATH/bin:$PATH"
 # Install
 source "$PROMETHEUS_INSTALL/packaging/all.sh"
 source "$PROMETHEUS_INSTALL/config/all.sh"
-source "$PROMETHEUS_INSTALL/login/all.sh"

@@ -16,3 +16,6 @@ if [[ -d ~/.config/quickshell/theme && ! -L ~/.config/quickshell/theme ]]; then
   }
 fi
 ln -snf ~/.config/prometheus/current/theme ~/.config/quickshell/theme
+
+mkdir -p ~/.config/zathura
+ln -snf ~/.config/prometheus/current/theme/theme.zathurarc ~/.config/zathura/zathurarc

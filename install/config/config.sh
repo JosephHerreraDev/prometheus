@@ -27,6 +27,6 @@ mkdir -p "$HOME/.config"
 for package_path in "$CONFIG_ROOT"/*; do
   [[ -d "$package_path/.config" ]] || continue
   package="${package_path##*/}"
-  stow --dir="$CONFIG_ROOT" --target="$HOME" --restow "$package"
+  stow --dir="$CONFIG_ROOT" --target="$HOME" --restow --no-folding "$package"
 done
 
