@@ -24,9 +24,18 @@ fi
 
 mkdir -p "$HOME/.config"
 
+linked_packages=0
 for package_path in "$CONFIG_ROOT"/*; do
   [[ -d "$package_path/.config" ]] || continue
   package="${package_path##*/}"
   stow --dir="$CONFIG_ROOT" --target="$HOME" --restow --no-folding "$package"
+  ((linked_packages += 1))
 done
+
+if (( linked_packages == 0 )); then
+  echo "No Prometheus config packages were found in: $CONFIG_ROOT" >&2
+  exit 1
+fi
+
+echo "Linked $linked_packages Prometheus config packages into $HOME/.config"
 
