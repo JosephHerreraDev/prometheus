@@ -27,4 +27,4 @@ git clone https://github.com/JosephHerreraDev/prometheus.git "$TARGET"
 cd "$TARGET"
 
 echo -e "\nInstallation starting..."
-./install.sh
+bash ./install.sh
