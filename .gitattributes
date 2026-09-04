@@ -1,0 +1,4 @@
+*.sh text eol=lf
+bin/* text eol=lf
+*.packages text eol=lf
+*ctl text eol=lf

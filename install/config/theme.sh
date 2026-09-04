@@ -1,3 +1,5 @@
+#!/usr/bin/env bash
+set -euo pipefail
 # Setup user theme folder
 mkdir -p ~/.config/prometheus/themes
 

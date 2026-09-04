@@ -2,7 +2,10 @@
 set -euo pipefail
 
 QUICKSHELL_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")/.." && pwd -P)"
-PROMETHEUS_ROOT="$(cd "$QUICKSHELL_DIR/../../../.." && pwd)"
+if [[ -f "$HOME/.config/prometheus/environment.sh" ]]; then
+  source "$HOME/.config/prometheus/environment.sh"
+fi
+PROMETHEUS_ROOT="${PROMETHEUS_PATH:-$HOME/.local/share/prometheus}"
 
 export PROMETHEUS_PATH="$PROMETHEUS_ROOT"
 export PATH="$PROMETHEUS_ROOT/bin:$PATH"

@@ -1,4 +1,5 @@
 #!/bin/bash
+set -euo pipefail
 
 MAIN_DIRECTORY="$HOME/Pictures"
 REPO_URL="https://github.com/JosephHerreraDev/wallpapers.git"
@@ -9,7 +10,7 @@ cd "$MAIN_DIRECTORY" || exit
 
 if [ -d "$TARGET_DIR/.git" ]; then
     echo "Wallpapers already exist, pulling latest changes..."
-    git -C "$TARGET_DIR" pull
+    git -C "$TARGET_DIR" pull --ff-only
 else
-    git clone "$REPO_URL"
+    git clone "$REPO_URL" "$TARGET_DIR"
 fi

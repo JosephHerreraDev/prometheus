@@ -1,3 +1,5 @@
+#!/usr/bin/env bash
+set -euo pipefail
 # Install all base packages
 sudo pacman -Syu --noconfirm
 mapfile -t packages < <(

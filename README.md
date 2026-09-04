@@ -12,11 +12,29 @@ A modern, fast, customizable and minimal arch rice.
 ## Installation
     
 ```bash
-curl -sSL https://raw.githubusercontent.com/JosephHerreraDev/prometheus/main/boot.sh | bash
+curl -fsSL https://raw.githubusercontent.com/JosephHerreraDev/prometheus/main/boot.sh | bash
 ```
 
 > [!WARNING]
-> This is only for a fresh arch linux install.
+> Run on Arch Linux as a regular user with sudo access, not as root.
+
+To install from a local checkout, run from the project directory:
+
+```bash
+bash ./install.sh
+```
+
+The installer installs the official and AUR package lists, downloads wallpapers,
+then copies the supplied configurations into `~/.config` and sets the Nord theme.
+Unrelated configuration files are kept. Replaced files are backed up under
+`~/.local/state/prometheus/config-backup.*`. Configurations are copies: edits
+in `~/.config` do not update this Git checkout.
+
+Keep the checkout in place: theme assets and helper commands use it. The installer
+adds its environment to Bash startup files; log out and select Hyprland after
+installation. Installation stops if a stage fails; fix the reported error and
+rerun `bash ./install.sh`. The bootstrap reuses an existing checkout without
+removing local changes; update it yourself before rerunning if needed.
 
 ## Features
 

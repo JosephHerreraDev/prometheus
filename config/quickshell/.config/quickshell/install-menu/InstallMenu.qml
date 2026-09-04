@@ -139,7 +139,7 @@ Scope {
     repeat: false
     onTriggered: {
       if (root.pendingCommand.length > 0) {
-        Quickshell.execDetached(["bash", "-lc", "exec \"$HOME/.local/share/prometheus/bin/prometheus-install-menu\" " + root.pendingCommand])
+        Quickshell.execDetached(["bash", "-lc", "exec prometheus-install-menu " + root.pendingCommand])
         root.pendingCommand = ""
       }
     }

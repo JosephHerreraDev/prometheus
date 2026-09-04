@@ -1,4 +1,10 @@
 base-devel
+git
+quickshell
+xdg-utils
+libnotify
+pipewire
+pipewire-pulse
 kitty
 stow
 ttf-cascadia-code-nerd
@@ -94,3 +100,4 @@ woff2-font-awesome
 xdg-desktop-portal-gtk
 xdg-desktop-portal-hyprland
 zoxide
+jq
