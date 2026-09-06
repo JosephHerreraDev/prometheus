@@ -2,6 +2,7 @@ import Quickshell
 import QtQuick
 
 import "bar" as Bar
+import "connectivity" as Connectivity
 import "clipboard" as Clipboard
 import "install-menu" as InstallMenu
 import "launcher" as Launcher
@@ -29,6 +30,9 @@ ShellRoot {
   }
 
   Bar.NotificationManager {}
+
+  Connectivity.RadioPanel { menuState: menuState; kind: "wifi" }
+  Connectivity.RadioPanel { menuState: menuState; kind: "bluetooth" }
 
   Osd.ControlOsd {
     systemState: systemState

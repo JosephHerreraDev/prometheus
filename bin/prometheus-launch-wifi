@@ -1,7 +1,3 @@
 #!/bin/bash
 
-# Launch the Prometheus wifi controls (provided by the Impala TUI).
-# Attempts to unblock the wifi service first in case it should be been blocked.
-
-rfkill unblock wifi
-prometheus-launch-or-focus-tui impala
+exec qs ipc call wifi toggle

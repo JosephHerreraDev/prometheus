@@ -19,7 +19,7 @@ wl-clipboard
 alsa-utils
 bash-completion
 bat
-bluetui
+bluez
 brightnessctl
 btop
 clang
@@ -50,7 +50,6 @@ hyprland-guiutils
 hyprpicker
 hyprshot
 hyprsunset
-impala
 imv
 inxi
 iwd

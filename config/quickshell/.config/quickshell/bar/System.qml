@@ -186,12 +186,12 @@ Pill {
         {
           kind: "bluetooth",
           icon: "../icons/bluetooth.svg",
-          command: "prometheus-launch-bluetooth"
+          command: "qs ipc call bluetooth toggle"
         },
         {
           kind: "wifi",
           icon: "../icons/wifi.svg",
-          command: "prometheus-launch-wifi"
+          command: "qs ipc call wifi toggle"
         },
         {
           kind: "brightness",

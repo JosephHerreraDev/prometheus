@@ -1,7 +1,3 @@
 #!/bin/bash
 
-# Launch the Prometheus bluetooth controls TUI (provided by bluetui).
-# Also attempts to unblock bluetooth service if rfkill had blocked it.
-
-rfkill unblock bluetooth
-exec prometheus-launch-or-focus-tui bluetui
+exec qs ipc call bluetooth toggle

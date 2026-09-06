@@ -25,10 +25,19 @@ bash ./install.sh
 ```
 
 The installer installs the official and AUR package lists, downloads wallpapers,
-then copies the supplied configurations into `~/.config` and sets the Nord theme.
+then links the supplied configurations into `~/.config` with GNU Stow and sets the Nord theme.
 Unrelated configuration files are kept. Replaced files are backed up under
-`~/.local/state/prometheus/config-backup.*`. Configurations are copies: edits
-in `~/.config` do not update this Git checkout.
+`~/.local/state/prometheus/config-backup.*`. Edits in the checkout immediately
+appear through the links in `~/.config`; editing a linked file also updates the
+checkout. Applications may need a reload to pick up changes.
+
+To migrate existing copies or link newly added files without reinstalling packages:
+
+```bash
+bash install/config/config.sh
+```
+
+Stow keeps directories unfolded so generated theme files stay outside the checkout.
 
 Keep the checkout in place: theme assets and helper commands use it. The installer
 adds its environment to Bash startup files; log out and select Hyprland after

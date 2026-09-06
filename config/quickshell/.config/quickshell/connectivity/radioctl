@@ -1,0 +1,205 @@
+#!/usr/bin/env python3
+"""Line-delimited JSON bridge to iwd/BlueZ. Credentials travel only over stdin."""
+import json
+import os
+import sys
+import subprocess
+from gi.repository import Gio, GLib
+
+KIND = sys.argv[1]
+WIFI = KIND == 'wifi'
+SERVICE = 'net.connman.iwd' if WIFI else 'org.bluez'
+PREFIX = 'net.connman.iwd.' if WIFI else 'org.bluez.'
+bus = Gio.bus_get_sync(Gio.BusType.SYSTEM, None)
+loop = GLib.MainLoop()
+pending = None
+busy = False
+operation = None
+
+
+def emit(**data):
+    print(json.dumps(data), flush=True)
+
+
+def call(path, interface, method, args=None):
+    return bus.call_sync(SERVICE, path, interface, method, args, None,
+                         Gio.DBusCallFlags.NONE, 5000, None).unpack()
+
+
+def snapshot():
+    try:
+        objects = call('/', 'org.freedesktop.DBus.ObjectManager', 'GetManagedObjects')[0]
+        adapters, items = [], []
+        for path, interfaces in objects.items():
+            props = interfaces.get(PREFIX + ('Device' if WIFI else 'Adapter1'))
+            if props is not None:
+                adapters.append(dict(path=path, name=props.get('Name', props.get('Alias', path)),
+                                     powered=props.get('Powered', False)))
+            props = interfaces.get(PREFIX + ('Network' if WIFI else 'Device1'))
+            if props is not None:
+                items.append(dict(path=path, name=props.get('Name', props.get('Alias', path)),
+                                  connected=props.get('Connected', False),
+                                  paired=props.get('Paired', False),
+                                  security=props.get('Type', ''),
+                                  station=props.get('Device', ''),
+                                  adapter=props.get('Adapter', ''),
+                                  known=props.get('KnownNetwork', '')))
+        items.sort(key=lambda item: (not item['connected'], item['name'].lower()))
+        emit(adapters=adapters, items=items)
+    except GLib.Error as error:
+        emit(adapters=[], items=[], error=str(error))
+    return True
+
+
+def async_call(path, interface, method, args=None, after=None):
+    global busy, operation
+    operation = (path, interface, method)
+    busy = True
+    emit(busy=True, error='')
+
+    def done(connection, result):
+        global busy, operation
+        operation = None
+        busy = False
+        try:
+            connection.call_finish(result)
+            if after:
+                after()
+        except GLib.Error as error:
+            emit(error=str(error))
+        emit(busy=busy, prompt=None)
+        snapshot()
+
+    bus.call(SERVICE, path, interface, method, args, None,
+             Gio.DBusCallFlags.NONE, 120000, None, done)
+
+
+agent_interface = PREFIX + ('Agent' if WIFI else 'Agent1')
+methods = {'Release': ('', ''), 'Cancel': ('s' if WIFI else '', '')}
+if WIFI:
+    methods.update(RequestPassphrase=('o', 's'), RequestPrivateKeyPassphrase=('o', 's'),
+                   RequestUserNameAndPassword=('o', 'ss'), RequestUserPassword=('os', 's'))
+else:
+    methods.update(RequestPinCode=('o', 's'), RequestPasskey=('o', 'u'),
+                   DisplayPinCode=('os', ''), DisplayPasskey=('ouq', ''),
+                   RequestConfirmation=('ou', ''), RequestAuthorization=('o', ''),
+                   AuthorizeService=('os', ''))
+xml = '<node><interface name="' + agent_interface + '">'
+for name, (inputs, outputs) in methods.items():
+    xml += '<method name="' + name + '">'
+    for direction, signature in [('in', inputs), ('out', outputs)]:
+        xml += ''.join('<arg type="' + t + '" direction="' + direction + '"/>' for t in signature)
+    xml += '</method>'
+xml += '</interface></node>'
+
+
+def reject():
+    global pending
+    if pending:
+        pending[0].return_dbus_error(agent_interface + '.Error.Canceled' if WIFI
+                                     else 'org.bluez.Error.Canceled', 'Canceled by user')
+        pending = None
+    emit(prompt=None)
+
+
+def agent(connection, sender, path, interface, method, parameters, invocation):
+    global pending
+    args = parameters.unpack()
+    if method in ('Cancel', 'Release'):
+        reject()
+        invocation.return_value(None)
+        return
+    if method.startswith('Display'):
+        code = str(args[1]).zfill(6)
+        emit(prompt=dict(label='Enter on the device: ' + code, signature='display'))
+        invocation.return_value(None)
+        return
+    reject()
+    signature = methods[method][1]
+    label = {'RequestPassphrase': 'Wi-Fi password', 'RequestPinCode': 'Device PIN',
+             'RequestPasskey': 'Device passkey', 'RequestUserNameAndPassword': 'Username and password',
+             'RequestUserPassword': 'Password', 'RequestPrivateKeyPassphrase': 'Private key password'}.get(method, 'Allow pairing / service?')
+    if method == 'RequestConfirmation':
+        label = 'Does the device show ' + str(args[1]).zfill(6) + '?'
+    pending = (invocation, signature)
+    emit(prompt=dict(label=label, signature=signature))
+
+
+bus.register_object('/prometheus/agent', Gio.DBusNodeInfo.new_for_xml(xml).interfaces[0], agent, None, None)
+try:
+    call('/net/connman/iwd' if WIFI else '/org/bluez',
+         PREFIX + ('AgentManager' if WIFI else 'AgentManager1'), 'RegisterAgent',
+         GLib.Variant('(o)', ('/prometheus/agent',)) if WIFI else
+         GLib.Variant('(os)', ('/prometheus/agent', 'KeyboardDisplay')))
+except GLib.Error as error:
+    emit(error=str(error))
+
+
+def dispatch(request):
+    global pending
+    action = request['action']
+    path = request.get('path', '')
+    if action == 'reply' and pending:
+        invocation, signature = pending
+        value = request.get('value', '')
+        if signature == 'u' and (not value.isdigit() or not 0 <= int(value) <= 999999):
+            emit(error='Enter a passkey from 000000 to 999999.')
+            return
+        values = (request.get('username', ''), value) if signature == 'ss' else ((int(value),) if signature == 'u' else ((value,) if signature else ()))
+        invocation.return_value(GLib.Variant('(' + signature + ')', values))
+        pending = None
+        emit(prompt=None)
+    elif action == 'cancel':
+        reject()
+        if operation and not WIFI and operation[2] == 'Pair':
+            call(operation[0], PREFIX + 'Device1', 'CancelPairing')
+    elif action == 'refresh':
+        snapshot()
+    elif busy:
+        return
+    elif action == 'power':
+        if request['enabled']:
+            subprocess.run(['rfkill', 'unblock', KIND], check=True, capture_output=True)
+        async_call(path, 'org.freedesktop.DBus.Properties', 'Set',
+                   GLib.Variant('(ssv)', (PREFIX + ('Device' if WIFI else 'Adapter1'), 'Powered', GLib.Variant('b', request['enabled']))))
+    elif action == 'scan':
+        async_call(path, PREFIX + ('Station' if WIFI else 'Adapter1'), 'Scan' if WIFI else 'StartDiscovery')
+    elif action == 'stop' and not WIFI:
+        async_call(path, PREFIX + 'Adapter1', 'StopDiscovery')
+    elif action == 'connect':
+        async_call(path, PREFIX + ('Network' if WIFI else 'Device1'), 'Connect')
+    elif action == 'disconnect':
+        async_call(path, PREFIX + ('Station' if WIFI else 'Device1'), 'Disconnect')
+    elif action == 'pair' and not WIFI:
+        async_call(path, PREFIX + 'Device1', 'Pair', after=lambda: async_call(path, PREFIX + 'Device1', 'Connect'))
+    elif action == 'forget':
+        if WIFI:
+            async_call(path, PREFIX + 'KnownNetwork', 'Forget')
+        else:
+            async_call(request['adapter'], PREFIX + 'Adapter1', 'RemoveDevice', GLib.Variant('(o)', (path,)))
+
+
+buffer = b''
+
+
+def read_input(fd, condition):
+    global buffer
+    chunk = os.read(fd, 65536)
+    if not chunk:
+        reject()
+        loop.quit()
+        return False
+    buffer += chunk
+    while b'\n' in buffer:
+        line, buffer = buffer.split(b'\n', 1)
+        try:
+            dispatch(json.loads(line))
+        except (ValueError, KeyError, GLib.Error, subprocess.SubprocessError) as error:
+            emit(error=str(error))
+    return True
+
+
+GLib.io_add_watch(sys.stdin.fileno(), GLib.IO_IN | GLib.IO_HUP, read_input)
+GLib.timeout_add_seconds(3, snapshot)
+snapshot()
+loop.run()
