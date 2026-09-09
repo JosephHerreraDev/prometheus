@@ -52,3 +52,34 @@ removing local changes; update it yourself before rerunning if needed.
 - Wallpapers, from the current theme or in general
 - Quickshell based: all menus, bar, notification manager.
 
+### Login and lock screens
+
+Prometheus includes its own QML SDDM greeter, inspired by
+[SilentSDDM](https://github.com/uiriansan/SilentSDDM)'s default presentation:
+a large clock and date, a key/click transition into login, and translucent rounded
+controls. It does not install or load SilentSDDM. Hyprlock uses matching typography,
+colors, input dimensions, and the same wallpaper. It keeps a persistent native
+password field; it does not run the greeter's QML or login transition.
+
+The full installer sets up both screens. For an existing installation:
+
+```bash
+bash install/config/lockscreen.sh
+bash install/config/config.sh
+```
+
+Setup requires sudo. It copies the current wallpaper to a system-readable location
+for both screens; pass an image path to `lockscreen.sh` to choose another image.
+Without a wallpaper both screens use the same dark solid background. Desktop theme
+switches do not change this snapshot. Edit `default/lockscreen/style.json` and rerun
+setup to update both styles together. No third-party theme or fonts are required.
+
+An existing `/etc/sddm.conf` is backed up before its theme settings are updated.
+Setup does not restart SDDM or log you out. Preview before your next login:
+
+```bash
+sddm-greeter-qt6 --test-mode --theme /usr/share/sddm/themes/prometheus
+```
+
+Use the power menu's Lock action to check hyprlock (this locks the session).
+

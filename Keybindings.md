@@ -19,7 +19,7 @@
 | `SUPER + h `           | Move focus to window on left   |
 | `SUPER + j `           | Move focus to window on bottom |
 | `SUPER + k `           | Move focus to window on top    |
-| `SUPER + l `           | Move focus to window on right  |
+| `SUPER + Right`        | Move focus to window on right  |
 
 ## Menu and Utilities
 
@@ -32,7 +32,7 @@
 | `SUPER + ALT + W`     | Current theme wallpaper selector |
 | `PRINT`               | Screenshot menu                  |
 | `SUPER + SHIFT + V`   | Clipboard history                |
-| `SUPER + SHIFT + L`   | Lock session                     |
+| `SUPER + L`           | Lock session                     |
 
 ## Programs
 
