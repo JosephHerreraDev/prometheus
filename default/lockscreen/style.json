@@ -1,0 +1,12 @@
+{
+  "font": "sans-serif",
+  "foreground": "#ffffff",
+  "background": "#15171c",
+  "clockSize": 70,
+  "dateSize": 14,
+  "userSize": 16,
+  "inputWidth": 240,
+  "inputHeight": 36,
+  "radius": 10,
+  "inputOpacity": 0.15
+}

@@ -1,0 +1,8 @@
+[SddmGreeterTheme]
+Name=Prometheus
+Description=Prometheus login and lock theme
+Type=sddm-theme
+Theme-Id=prometheus
+Theme-API=2.0
+MainScript=Main.qml
+QtVersion=6
