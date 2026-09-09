@@ -50,7 +50,22 @@ removing local changes; update it yourself before rerunning if needed.
 - Hyprland window manager with custom settings
 - Theme switching from predefined selections, with the ability to add custom ones
 - Wallpapers, from the current theme or in general
-- Quickshell based: all menus, bar, notification manager.
+- Quickshell based: 
+  - Status Bar
+  - Wallpaper selector/ Wallpaper selector by theme
+  - Powermenu
+  - App laucher
+  - Theme selector
+  - System settings
+  - Screenshot menu
+  - Install menu
+  - Volume / Brightness notification indicator
+  - Clipboard
+  - Update control (pending)
+  - Notification center (pending)
+  - Calendar (pending)
+  - Recording indicator (pending)
+  - Music player (pending)
 
 ### Login and lock screens
 
